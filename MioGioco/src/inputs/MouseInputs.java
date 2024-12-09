@@ -21,9 +21,9 @@ public class MouseInputs implements MouseListener, MouseMotionListener
     {
         switch (StatoGioco.stato)
         {
-            case MENU ->
+            case PLAYING ->
             {
-                pannello.getGioco ().getMenu ().mouseClicked (e);
+                pannello.getGioco ().getPlaying ().mouseClicked (e);
             }
         }
     }

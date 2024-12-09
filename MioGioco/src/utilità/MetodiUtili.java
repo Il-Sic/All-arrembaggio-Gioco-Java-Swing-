@@ -6,18 +6,15 @@ import java.awt.geom.Rectangle2D;
 
 public class MetodiUtili
 {
-    public static boolean PuòMuoversiQui (float x, float y, float larghezza, float altezza, int [][] datiLvl)
+    public static boolean puòMuoversiQui(float x, float y, float larghezza, float altezza, int [][] datiLvl)
     {
-        if (!IsSolido (x, y, datiLvl))
+        if (!isSolido(x, y, datiLvl))
         {
-            if (!IsSolido (x + larghezza, y + altezza, datiLvl))
+            if (!isSolido(x + larghezza, y + altezza, datiLvl))
             {
-                if (!IsSolido (x + larghezza, y, datiLvl))
+                if (!isSolido(x + larghezza, y, datiLvl))
                 {
-                    if (!IsSolido (x, y + altezza, datiLvl))
-                    {
-                        return true;
-                    }
+                    return !isSolido(x, y + altezza, datiLvl);
                 }
             }
         }
@@ -25,7 +22,7 @@ public class MetodiUtili
         return false;
     }
 
-    private static boolean IsSolido (float x, float y, int [][] datiLvl)
+    private static boolean isSolido(float x, float y, int [][] datiLvl)
     {
         int larghezzaMax = datiLvl [0].length * Gioco.DIMENSIONE_CASELLA;
 
@@ -41,7 +38,12 @@ public class MetodiUtili
         float indiceX = x / Gioco.DIMENSIONE_CASELLA;
         float indiceY = y / Gioco.DIMENSIONE_CASELLA;
 
-        int valore = datiLvl [(int) indiceY][(int) indiceX];
+        return isCasellaSolida ((int) indiceX, (int) indiceY, datiLvl);
+    }
+
+    private static boolean isCasellaSolida (int casellaX, int casellaY, int[][] datiLvl)
+    {
+        int valore = datiLvl [casellaY][casellaX];
 
         if (valore >= 48 || valore < 0 || valore != 11)
         {
@@ -51,9 +53,9 @@ public class MetodiUtili
         return false;
     }
 
-    public static float GetXPosEntitàVicinoAlMuro (Rectangle2D.Float hitbox, float velX)
+    public static float getPosizioneEntitàVicinoAlMuroX(Rectangle2D.Float hitbox, float velX)
     {
-        int casellaCorr = (int) hitbox.x / Gioco.DIMENSIONE_CASELLA;
+        int casellaCorr = (int) (hitbox.x / Gioco.DIMENSIONE_CASELLA);
         if (velX > 0)
         {
             // è a destra
@@ -68,9 +70,9 @@ public class MetodiUtili
         }
     }
 
-    public static float GetYPosEntitàVicinoAlMuro (Rectangle2D.Float hitbox, float velAria)
+    public static float getPosizioneEntitàVicinoAlMuroY(Rectangle2D.Float hitbox, float velAria)
     {
-        int casellaCorr = (int) hitbox.y / Gioco.DIMENSIONE_CASELLA;
+        int casellaCorr = (int) (hitbox.y / Gioco.DIMENSIONE_CASELLA);
         if (velAria > 0)
         {
             // è in caduta - toccando il terreno
@@ -85,16 +87,54 @@ public class MetodiUtili
         }
     }
 
-    public static boolean EntitàSulPavimento (Rectangle2D.Float hitbox, int [][] datiLvl)
+    public static boolean isEntitàSulPavimento(Rectangle2D.Float hitbox, int [][] datiLvl)
     {
         // Controlla il pixel vicino alla parte inferiore sinistra e destra
-        if (!IsSolido (hitbox.x, hitbox.y + hitbox.height + 1, datiLvl))
+        if (!isSolido(hitbox.x, hitbox.y + hitbox.height + 1, datiLvl))
         {
-            if (!IsSolido (hitbox.x + hitbox.width, hitbox.y + hitbox.height + 1, datiLvl))
+            if (!isSolido(hitbox.x + hitbox.width, hitbox.y + hitbox.height + 1, datiLvl))
             {
                 return false;
             }
         }
         return true;
+    }
+
+    public static boolean isPavimento(Rectangle2D.Float hitbox, float xVel, int [][] datiLvl)
+    {
+        return isSolido(hitbox.x + xVel, hitbox.y + hitbox.height + 1, datiLvl);
+    }
+
+    public static boolean isCaselleTutteCalpestabili(int startX, int endX, int y,int[][] datiLvl)
+    {
+        for (int i = 0; i < endX - startX; i ++)
+        {
+            if (isCasellaSolida (startX + i, y, datiLvl))
+            {
+                return false;
+            }
+
+            if (!isCasellaSolida (startX + i, y  + 1, datiLvl))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static boolean isVistaChiara (int [][] datiLvl, Rectangle2D.Float primaHitbox, Rectangle2D.Float secondaHitbox, int casellaY)
+    {
+        int primaCasellaX = (int) (primaHitbox.x / Gioco.DIMENSIONE_CASELLA);
+        int secondaCasellaX = (int) (secondaHitbox.x / Gioco.DIMENSIONE_CASELLA);
+
+        if (primaCasellaX > secondaCasellaX)
+        {
+            return isCaselleTutteCalpestabili (secondaCasellaX, primaCasellaX, casellaY, datiLvl);
+        }
+        else
+        {
+            return isCaselleTutteCalpestabili (primaCasellaX, secondaCasellaX, casellaY, datiLvl);
+        }
     }
 }

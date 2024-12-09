@@ -29,15 +29,15 @@ public class GestioneNemico
         granchi = CaricaSalva.GetGranchi();
     }
 
-    public void update ()
+    public void update (int [][] datiLvl, Giocatore giocatore)
     {
         for (Granchio granchio : granchi)
         {
-            granchio.update();
+            granchio.update(datiLvl, giocatore);
         }
     }
 
-    public void draw(Graphics g, int xLvlOffset)
+    public void draw (Graphics g, int xLvlOffset)
     {
         drawGranchi (g, xLvlOffset);
     }
@@ -46,7 +46,9 @@ public class GestioneNemico
     {
         for (Granchio granchio : granchi)
         {
-            g.drawImage(granchioArray [granchio.getStatoNemico()][granchio.getIndiceAni()], (int) granchio.getHitBox().x - xLvlOffset, (int) granchio.getHitBox().y, LARGHEZZA_GRANCHIO, ALTEZZA_GRANCHIO,null);
+            g.drawImage(granchioArray [granchio.getStatoNemico()][granchio.getIndiceAni()], (int) (granchio.getHitbox().x) - xLvlOffset - GRANCHIO_DRAWOFFSET_X, (int) (granchio.getHitbox().y) - GRANCHIO_DRAWOFFSET_Y, LARGHEZZA_GRANCHIO, ALTEZZA_GRANCHIO,null);
+
+//            granchio.drawHitBox(g, xLvlOffset);
         }
     }
 

@@ -33,7 +33,6 @@ public class Giocatore extends Entità
         super (x, y, larghezza, altezza);
         caricaAnimazioni ();
         initHitBox (x, y, (int) (20 * Gioco.SCALA), (int) (27 * Gioco.SCALA));
-
     }
 
     public void update ()
@@ -44,8 +43,8 @@ public class Giocatore extends Entità
     }
     public void render (Graphics g, int lvlOffset)
     {
-        g.drawImage (animazioni [azioneGiocatore][indiceAni],  (int) (hitBox.x - xDrawOffset) - lvlOffset,  (int) (hitBox.y - yDrawOffset) , larghezza, altezza, null);              // qui modifico l' immagine e la sua dimensione
-//        drawHitBox (g);
+        g.drawImage (animazioni [azioneGiocatore][indiceAni],  (int) (hitbox.x - xDrawOffset) - lvlOffset,  (int) (hitbox.y - yDrawOffset) , larghezza, altezza, null);              // qui modifico l' immagine e la sua dimensione
+//        drawHitBox (g, lvlOffset);
     }
 
 
@@ -145,7 +144,7 @@ public class Giocatore extends Entità
 
         if (!inAria)
         {
-            if (!EntitàSulPavimento (hitBox, datiLvl))
+            if (!isEntitàSulPavimento(hitbox, datiLvl))
             {
                 inAria = true;
             }
@@ -153,15 +152,15 @@ public class Giocatore extends Entità
 
         if (inAria)
         {
-            if (PuòMuoversiQui (hitBox.x, hitBox.y + velAria, hitBox.width, hitBox.height, datiLvl))
+            if (puòMuoversiQui(hitbox.x, hitbox.y + velAria, hitbox.width, hitbox.height, datiLvl))
             {
-                hitBox.y += velAria;
+                hitbox.y += velAria;
                 velAria += gravità;
-                updateXPos (velX);
+                updatePosX(velX);
             }
             else
             {
-                hitBox.y = GetYPosEntitàVicinoAlMuro (hitBox, velAria);
+                hitbox.y = getPosizioneEntitàVicinoAlMuroY(hitbox, velAria);
 
                 if (velAria > 0)
                 {
@@ -172,12 +171,12 @@ public class Giocatore extends Entità
                     velAria = velCadutaDopoCollisione;
                 }
 
-                updateXPos (velX);
+                updatePosX(velX);
             }
         }
         else
         {
-            updateXPos (velX);
+            updatePosX(velX);
         }
 
         movimento = true;
@@ -201,15 +200,15 @@ public class Giocatore extends Entità
         velAria = 0f;
     }
 
-    private void updateXPos (float velX)
+    private void updatePosX(float velX)
     {
-        if (PuòMuoversiQui (hitBox.x + velX, hitBox.y, hitBox.width, hitBox.height, datiLvl))
+        if (puòMuoversiQui(hitbox.x + velX, hitbox.y, hitbox.width, hitbox.height, datiLvl))
         {
-            hitBox.x += velX;
+            hitbox.x += velX;
         }
         else
         {
-            hitBox.x = GetXPosEntitàVicinoAlMuro (hitBox, velX);
+            hitbox.x = getPosizioneEntitàVicinoAlMuroX(hitbox, velX);
         }
 
     }
@@ -233,7 +232,7 @@ public class Giocatore extends Entità
     {
         this.datiLvl = datiLvl;
 
-        if (!EntitàSulPavimento (hitBox, datiLvl))
+        if (!isEntitàSulPavimento(hitbox, datiLvl))
         {
             inAria = true;
         }

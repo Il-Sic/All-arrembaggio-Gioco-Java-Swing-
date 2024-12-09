@@ -1,6 +1,8 @@
 package statigioco;
 
+import entità.GestioneNemico;
 import entità.Giocatore;
+import entità.Granchio;
 import livelli.GestioneLivello;
 import main.Gioco;
 import ui.OverlayPausa;
@@ -9,10 +11,15 @@ import utilità.CaricaSalva;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.util.Random;
+
+import static utilità.Costanti.Ambiente.*;
 
 public class Playing extends Stato implements StatoMetodi
 {
     private Giocatore giocatore;
+    private GestioneNemico gestioneNemico;
     private GestioneLivello gestioneLivello;
     private OverlayPausa overlayPausa;
     private boolean inPausa = false;
@@ -24,15 +31,30 @@ public class Playing extends Stato implements StatoMetodi
     private int maxCaselleOffset = larghezzaCaselleLvl - Gioco.LARGHEZZA_CASELLA;
     private int maxXLvlOffset = maxCaselleOffset * Gioco.DIMENSIONE_CASELLA;
 
+    private BufferedImage immagineBackgound, grandeNuvola, piccolaNuvola;
+    private int [] posizionePiccolaNuvola;
+    private Random rand = new Random();
+
     public Playing (Gioco gioco)
     {
         super (gioco);
         initClassi ();
+
+        immagineBackgound = CaricaSalva.GetAtltanteSprite(CaricaSalva.BACKGROUND_IN_GIOCO);
+        grandeNuvola = CaricaSalva.GetAtltanteSprite(CaricaSalva.GRANDI_NUVOLE);
+        piccolaNuvola = CaricaSalva.GetAtltanteSprite(CaricaSalva.PICCOLE_NUVOLE);
+
+        posizionePiccolaNuvola = new int [8];
+        for (int i = 0; i < posizionePiccolaNuvola.length; i++)
+        {
+            posizionePiccolaNuvola [i] = (int) (90 * Gioco.SCALA) + rand.nextInt ((int) (100 * Gioco.SCALA));
+        }
     }
 
     private void initClassi ()
     {
         gestioneLivello = new GestioneLivello (gioco);
+        gestioneNemico = new GestioneNemico (this);
         giocatore = new Giocatore (200, 200, (int) (64 * Gioco.SCALA), (int) (40 * Gioco.SCALA));
         giocatore.caricaDatiLvl (gestioneLivello.getLivelloCorrente().getDatiLvl());
         overlayPausa = new OverlayPausa (this);
@@ -60,6 +82,7 @@ public class Playing extends Stato implements StatoMetodi
         {
             gestioneLivello.update ();
             giocatore.update ();
+            gestioneNemico.update (gestioneLivello.getLivelloCorrente().getDatiLvl(), giocatore);
             controllaVicinoBordo ();
         }
         else
@@ -70,7 +93,7 @@ public class Playing extends Stato implements StatoMetodi
 
     private void controllaVicinoBordo ()
     {
-        int giocatoreX = (int) giocatore.getHitBox ().x;
+        int giocatoreX = (int) giocatore.getHitbox().x;
         int diff = giocatoreX - xLvlOffset;
 
         if (diff > bordoDes)
@@ -92,15 +115,33 @@ public class Playing extends Stato implements StatoMetodi
         }
     }
 
+    private void drawNuvole (Graphics g)
+    {
+        for (int i = 0; i < 3; i ++)
+        {
+            g.drawImage (grandeNuvola, i * LARGHEZZA_GRANDE_NUVOLA - (int) (xLvlOffset * 0.3), (int) (204 * Gioco.SCALA), LARGHEZZA_GRANDE_NUVOLA, ALTEZZA_GRANDE_NUVOLA, null);
+        }
+
+        for (int i = 0; i < posizionePiccolaNuvola.length; i ++)
+        {
+            g.drawImage (piccolaNuvola, LARGHEZZA_PICCOLA_NUVOLA * 4 * i - (int) (xLvlOffset * 0.7), posizionePiccolaNuvola [i],  LARGHEZZA_PICCOLA_NUVOLA, ALTEZZA_PICCOLA_NUVOLA, null);
+        }
+    }
+
     @Override
     public void draw (Graphics g)
     {
+        g.drawImage(immagineBackgound, 0,0, Gioco.LARGHEZZA_GIOCO, Gioco.ALTEZZA_GIOCO, null);
+
+        drawNuvole (g);
+
         gestioneLivello.draw (g, xLvlOffset);
         giocatore.render (g, xLvlOffset);
+        gestioneNemico.draw (g, xLvlOffset);
 
         if (inPausa)
         {
-            g.setColor (new Color (0, 0, 0, 100));
+            g.setColor (new Color (0, 0, 0, 150));
             g.fillRect (0, 0, Gioco.LARGHEZZA_GIOCO, Gioco.ALTEZZA_GIOCO);
             overlayPausa.draw (g);
         }

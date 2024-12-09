@@ -4,6 +4,66 @@ import main.Gioco;
 
 public class Costanti
 {
+    public static class CostantiNemico
+    {
+        public static final int GRANCHIO = 0;
+
+        public static final int IDLE = 0;
+        public static final int CORSA = 1;
+        public static final int ATTACCO = 2;
+        public static final int COLPO = 3;
+        public static final int MORTE = 4;
+
+        public static final int ALTEZZA_GRANCHIO_DEFAULT = 32;
+        public static final int LARGHEZZA_GRANCHIO_DEFAULT = 72;
+
+        public static final int ALTEZZA_GRANCHIO = (int) (ALTEZZA_GRANCHIO_DEFAULT * Gioco.SCALA);
+        public static final int LARGHEZZA_GRANCHIO = (int) (LARGHEZZA_GRANCHIO_DEFAULT * Gioco.SCALA);
+
+        public static final int GRANCHIO_DRAWOFFSET_X = (int) (26 * Gioco.SCALA);
+        public static final int GRANCHIO_DRAWOFFSET_Y = (int) (9 * Gioco.SCALA);
+
+        public static int getContSprite (int tipoNemico, int statoNemico)
+        {
+            return switch (tipoNemico)
+            {
+                case GRANCHIO -> switch (statoNemico)
+                {
+                    case IDLE -> 9;
+
+                    case CORSA -> 6;
+
+                    case ATTACCO -> 7;
+
+                    case COLPO -> 4;
+
+                    case MORTE -> 5;
+
+                    default -> 0;
+                };
+
+                //                case STELLA -> switch (statoNemico)
+                //                {
+                //
+                //                }
+                default -> throw new IllegalStateException("Tipo nemico sconosciuto: " + tipoNemico);
+            };
+        }
+    }
+
+    public static class Ambiente
+    {
+        public static final int LARGHEZZA_GRANDE_NUVOLA_DEFAULT = 448;
+        public static final int ALTEZZA_GRANDE_NUVOLA_DEFAULT = 101;
+        public static final int LARGHEZZA_PICCOLA_NUVOLA_DEFAULT = 74;
+        public static final int ALTEZZA_PICCOLA_NUVOLA_DEFAULT = 24;
+
+        public static final int LARGHEZZA_GRANDE_NUVOLA = (int) (LARGHEZZA_GRANDE_NUVOLA_DEFAULT * Gioco.SCALA);
+        public static final int ALTEZZA_GRANDE_NUVOLA = (int) (ALTEZZA_GRANDE_NUVOLA_DEFAULT * Gioco.SCALA);
+        public static final int LARGHEZZA_PICCOLA_NUVOLA = (int) (LARGHEZZA_PICCOLA_NUVOLA_DEFAULT * Gioco.SCALA);
+        public static final int ALTEZZA_PICCOLA_NUVOLA = (int) (ALTEZZA_PICCOLA_NUVOLA_DEFAULT * Gioco.SCALA);
+    }
+
     public static  class UI
     {
         public static class Buttons
@@ -42,7 +102,7 @@ public class Costanti
 
     public static class Direzioni
     {
-        public static final int SINSTRA = 0;
+        public static final int SINISTRA = 0;
         public static final int SU = 1;
         public static final int DESTRA = 2;
         public static final int SOTTO = 3;
@@ -61,9 +121,9 @@ public class Costanti
         public static final int ATTACCO_SALTO_1 = 7;
         public static final int ATTACCO_SALTO_2 = 8;
 
-        public static int GetSpriteCont (int azione_giocatore)
+        public static int GetSpriteCont (int azioneGiocatore)
         {
-            return switch (azione_giocatore)
+            return switch (azioneGiocatore)
             {
                 case CORSA -> 6;
                 case IDLE -> 5;

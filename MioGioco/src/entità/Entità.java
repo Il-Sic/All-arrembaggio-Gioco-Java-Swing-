@@ -7,7 +7,7 @@ public abstract class Entità
 {
     protected float x, y;
     protected int larghezza, altezza;
-    protected Rectangle2D.Float hitBox;
+    protected Rectangle2D.Float hitbox;
 
     public Entità (float x, float y ,int larghezza, int altezza)
     {
@@ -17,15 +17,15 @@ public abstract class Entità
         this.altezza = altezza;
     }
 
-    protected void drawHitBox (Graphics g)
+    protected void drawHitBox (Graphics g, int xLvlOffset)
     {
         // debug hitbox
         g.setColor (Color.PINK);
-        g.drawRect ((int) hitBox.x, (int) hitBox.y, (int) hitBox.width, (int) hitBox.height);
+        g.drawRect ((int) hitbox.x - xLvlOffset, (int) hitbox.y, (int) hitbox.width, (int) hitbox.height);
     }
     protected void initHitBox(float x, float y, int larghezza, int altezza)
     {
-        hitBox = new Rectangle2D.Float (x, y, larghezza, altezza);
+        hitbox = new Rectangle2D.Float (x, y, larghezza, altezza);
     }
 
 //    public void updateHitBox ()
@@ -34,9 +34,9 @@ public abstract class Entità
 //        hitBox.y = (int) y;
 //    }
 
-    public Rectangle2D.Float getHitBox ()
+    public Rectangle2D.Float getHitbox()
     {
-        return hitBox;
+        return hitbox;
     }
 
 }
