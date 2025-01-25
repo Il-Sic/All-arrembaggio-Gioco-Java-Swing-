@@ -115,21 +115,20 @@ public class Costanti
         public static final int CORSA = 1;
         public static final int SALTO = 2;
         public static final int CADUTA = 3;
-        public static final int TERRENO = 4;
+        public static final int ATTACCO = 4;
         public static final int COLPO = 5;
-        public static final int ATTACCO_1 = 6;
-        public static final int ATTACCO_SALTO_1 = 7;
-        public static final int ATTACCO_SALTO_2 = 8;
+        public static final int MORTE = 6;
 
         public static int GetSpriteCont (int azioneGiocatore)
         {
             return switch (azioneGiocatore)
             {
+                case MORTE -> 8;
                 case CORSA -> 6;
                 case IDLE -> 5;
                 case COLPO -> 4;
-                case SALTO, ATTACCO_1, ATTACCO_SALTO_1, ATTACCO_SALTO_2 -> 3;
-                case TERRENO -> 2;
+                case SALTO, ATTACCO -> 3;
+                case CADUTA -> 1;
                 default -> 1;                   // e anche CADUTA
             };
         }

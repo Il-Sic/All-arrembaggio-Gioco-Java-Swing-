@@ -29,6 +29,7 @@ public class CaricaSalva
     public static final String BACKGROUND_IN_GIOCO = "background_in_gioco.png";
     public static final String PICCOLE_NUVOLE = "piccole_nuvole.png";
     public static final String GRANDI_NUVOLE = "grandi_nuvole.png";
+    public static final String BARRA_STATO = "health_power_bar.png";
 
     public static BufferedImage GetAtltanteSprite (String nomeFile)                        // restituisce un immagine memorizzata nel buffer
     {

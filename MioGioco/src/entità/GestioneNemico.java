@@ -40,15 +40,18 @@ public class GestioneNemico
     public void draw (Graphics g, int xLvlOffset)
     {
         drawGranchi (g, xLvlOffset);
+
     }
 
     private void drawGranchi(Graphics g, int xLvlOffset)
     {
         for (Granchio granchio : granchi)
         {
-            g.drawImage(granchioArray [granchio.getStatoNemico()][granchio.getIndiceAni()], (int) (granchio.getHitbox().x) - xLvlOffset - GRANCHIO_DRAWOFFSET_X, (int) (granchio.getHitbox().y) - GRANCHIO_DRAWOFFSET_Y, LARGHEZZA_GRANCHIO, ALTEZZA_GRANCHIO,null);
+            g.drawImage(granchioArray [granchio.getStatoNemico()][granchio.getIndiceAni()], (int) (granchio.getHitbox().x) - xLvlOffset - GRANCHIO_DRAWOFFSET_X + granchio.xFlip(), (int) (granchio.getHitbox().y) - GRANCHIO_DRAWOFFSET_Y, LARGHEZZA_GRANCHIO * granchio.lFlip(), ALTEZZA_GRANCHIO,null);
 
 //            granchio.drawHitBox(g, xLvlOffset);
+
+            granchio.drawAttackBox (g, xLvlOffset);
         }
     }
 

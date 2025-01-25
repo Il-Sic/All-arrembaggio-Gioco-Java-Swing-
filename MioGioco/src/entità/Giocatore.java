@@ -4,6 +4,7 @@ import main.Gioco;
 import utilità.CaricaSalva;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 import static utilità.Costanti.CostantiGiocatore.*;
@@ -28,27 +29,112 @@ public class Giocatore extends Entità
     private float velCadutaDopoCollisione =  0.5f * Gioco.SCALA;                // quando ad esempio si colpisce il tetto
     private boolean inAria = false;
 
+    // Barra di stato
+    private BufferedImage barraStatoImg;
+
+    private int larghezzaBarraStato = (int) (192 * Gioco.SCALA);
+    private int altezzaBarraStato = (int) (58 * Gioco.SCALA);
+    private int xBarraStato = (int) (10 * Gioco.SCALA);
+    private int yBarraStato = (int) (10 * Gioco.SCALA);
+
+    private int larghezzaBarraVita = (int) (150 * Gioco.SCALA);
+    private int altezzaBarraVita= (int) (4 * Gioco.SCALA);
+    private int xInizioBarraVita = (int) (34 * Gioco.SCALA);
+    private int yInizioBarraVita = (int) (14 * Gioco.SCALA);
+
+    private int vitaMax = 100;
+    private int vitaCorrente = vitaMax;
+    private int larghezzaVita = larghezzaBarraVita;
+
+    // Box attacco
+    private Rectangle2D.Float attackBox;
+
+    private int xFlip = 0;
+    private int lFlip = 1;
+
     public Giocatore (float x, float y, int larghezza, int altezza)
     {
         super (x, y, larghezza, altezza);
         caricaAnimazioni ();
         initHitBox (x, y, (int) (20 * Gioco.SCALA), (int) (27 * Gioco.SCALA));
+        initAttackBox ();
+    }
+
+    private void initAttackBox()
+    {
+        attackBox = new Rectangle2D.Float (x, y, (int) (20 * Gioco.SCALA), (int) (20 * Gioco.SCALA));
     }
 
     public void update ()
     {
+        updateBarraVita ();
+        updateAttackBox ();
+
         updatePos ();
         updateTickAnimazioni ();
         setAnimazione ();
     }
+
+    private void updateAttackBox()
+    {
+        if (destra)
+        {
+            attackBox.x = hitbox.x + hitbox.width + (int) (Gioco.SCALA * 10);
+        }
+        else if (sinistra)
+        {
+            attackBox.x = hitbox.x - hitbox.width - (int) (Gioco.SCALA * 10);
+        }
+
+        attackBox.y = hitbox.y + (Gioco.SCALA * 10);
+    }
+
+    private void updateBarraVita()
+    {
+        larghezzaVita = (int) ((vitaCorrente / (float) vitaMax) * larghezzaBarraVita);
+    }
+
+    public void cambiaSalute (int valore)
+    {
+        vitaCorrente += valore;
+
+        if (vitaCorrente <= vitaMax)
+        {
+            vitaCorrente = 0;
+
+            //gameOver ();
+        }
+        else if (vitaCorrente >= vitaMax)
+        {
+            vitaCorrente = vitaMax;
+        }
+    }
+
     public void render (Graphics g, int lvlOffset)
     {
-        g.drawImage (animazioni [azioneGiocatore][indiceAni],  (int) (hitbox.x - xDrawOffset) - lvlOffset,  (int) (hitbox.y - yDrawOffset) , larghezza, altezza, null);              // qui modifico l' immagine e la sua dimensione
+        g.drawImage (animazioni [azioneGiocatore][indiceAni],  (int) (hitbox.x - xDrawOffset) - lvlOffset + xFlip,  (int) (hitbox.y - yDrawOffset) , larghezza * lFlip, altezza, null);              // qui modifico l' immagine e la sua dimensione
 //        drawHitBox (g, lvlOffset);
+
+        drawAttackBox (g, lvlOffset);
+
+        drawUI (g);
+    }
+
+    private void drawAttackBox(Graphics g, int xLvlOffset)
+    {
+        g.setColor (Color.red);
+        g.drawRect ((int) attackBox.x - xLvlOffset, (int) attackBox.y, (int) attackBox.width, (int) attackBox.height);
+    }
+
+    private void drawUI (Graphics g)
+    {
+        g.drawImage (barraStatoImg, xBarraStato, yBarraStato, larghezzaBarraStato, altezzaBarraStato,null);
+        g.setColor (Color.red);
+        g.fillRect (xInizioBarraVita + xBarraStato, yInizioBarraVita + yBarraStato, larghezzaBarraVita, altezzaBarraVita);
     }
 
 
-//    public void setRectPos (int x, int y)
+    //    public void setRectPos (int x, int y)
 //    {
 //        this.x = x;
 //        this.y = y;
@@ -96,7 +182,7 @@ public class Giocatore extends Entità
 
         if (attacco)
         {
-            azioneGiocatore = ATTACCO_1;
+            azioneGiocatore = ATTACCO;
         }
 
         if (iniziaAni != azioneGiocatore)
@@ -134,12 +220,17 @@ public class Giocatore extends Entità
         if (sinistra)
         {
             velX -= velGiocatore;
+
+            xFlip = larghezza;
+            lFlip = -1;
         }
 
         if (destra)
         {
             velX += velGiocatore;
 
+            xFlip = 0;
+            lFlip = 1;
         }
 
         if (!inAria)
@@ -217,7 +308,7 @@ public class Giocatore extends Entità
     {
         BufferedImage img = CaricaSalva.GetAtltanteSprite(CaricaSalva.ALTLANTE_GIOCATORE);
 
-        animazioni = new BufferedImage [9][6];              // y e x dell' immagine
+        animazioni = new BufferedImage [7][8];              // y e x dell' immagine
 
         for (int i = 0; i < animazioni.length; i ++)
         {
@@ -226,6 +317,8 @@ public class Giocatore extends Entità
                 animazioni [i][j] = img.getSubimage (j * 64, i * 40, 64, 40);               // j è la x, i è la y dell' immagine
             }
         }
+
+        barraStatoImg = CaricaSalva.GetAtltanteSprite (CaricaSalva.BARRA_STATO);
     }
 
     public void caricaDatiLvl (int [][] datiLvl)
