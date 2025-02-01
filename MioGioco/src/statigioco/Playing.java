@@ -2,15 +2,16 @@ package statigioco;
 
 import entità.GestioneNemico;
 import entità.Giocatore;
-import entità.Granchio;
 import livelli.GestioneLivello;
 import main.Gioco;
+import ui.OverlayGameOver;
 import ui.OverlayPausa;
 import utilità.CaricaSalva;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
@@ -22,6 +23,7 @@ public class Playing extends Stato implements StatoMetodi
     private GestioneNemico gestioneNemico;
     private GestioneLivello gestioneLivello;
     private OverlayPausa overlayPausa;
+    private OverlayGameOver overlayGameOver;
     private boolean inPausa = false;
 
     private int xLvlOffset;
@@ -34,6 +36,8 @@ public class Playing extends Stato implements StatoMetodi
     private BufferedImage immagineBackgound, grandeNuvola, piccolaNuvola;
     private int [] posizionePiccolaNuvola;
     private Random rand = new Random();
+
+    private boolean gameOver;
 
     public Playing (Gioco gioco)
     {
@@ -55,9 +59,10 @@ public class Playing extends Stato implements StatoMetodi
     {
         gestioneLivello = new GestioneLivello (gioco);
         gestioneNemico = new GestioneNemico (this);
-        giocatore = new Giocatore (200, 200, (int) (64 * Gioco.SCALA), (int) (40 * Gioco.SCALA));
+        giocatore = new Giocatore (200, 200, (int) (64 * Gioco.SCALA), (int) (40 * Gioco.SCALA), this);
         giocatore.caricaDatiLvl (gestioneLivello.getLivelloCorrente().getDatiLvl());
         overlayPausa = new OverlayPausa (this);
+        overlayGameOver = new OverlayGameOver (this);
     }
 
     public void windowFocusLost ()
@@ -78,7 +83,7 @@ public class Playing extends Stato implements StatoMetodi
     @Override
     public void update ()
     {
-        if (!inPausa)
+        if (!inPausa && !gameOver)
         {
             gestioneLivello.update ();
             giocatore.update ();
@@ -145,41 +150,57 @@ public class Playing extends Stato implements StatoMetodi
             g.fillRect (0, 0, Gioco.LARGHEZZA_GIOCO, Gioco.ALTEZZA_GIOCO);
             overlayPausa.draw (g);
         }
+        else if (gameOver)
+        {
+            overlayGameOver.draw (g);
+        }
     }
 
     @Override
     public void mouseClicked (MouseEvent e)
     {
-        if (e.getButton() == MouseEvent.BUTTON1)
+        if (!gameOver)
         {
-            giocatore.setAttacco(true);
+            if (e.getButton() == MouseEvent.BUTTON1)
+            {
+                giocatore.setAttacco(true);
+            }
         }
     }
 
     @Override
     public void mousePressed (MouseEvent e)
     {
-        if (inPausa)
+        if (!gameOver)
         {
-            overlayPausa.mousePressed (e);
+            if (inPausa)
+            {
+                overlayPausa.mousePressed (e);
+            }
         }
     }
 
     @Override
     public void mouseReleased (MouseEvent e)
     {
-        if (inPausa)
+        if (!gameOver)
         {
-            overlayPausa.mouseReleased (e);
+            if (inPausa)
+            {
+                overlayPausa.mouseReleased (e);
+            }
         }
     }
 
     @Override
     public void mouseMoved (MouseEvent e)
     {
-        if (inPausa)
+        if (!gameOver)
         {
-            overlayPausa.mouseMoved (e);
+            if (inPausa)
+            {
+                overlayPausa.mouseMoved (e);
+            }
         }
     }
 
@@ -194,36 +215,43 @@ public class Playing extends Stato implements StatoMetodi
     @Override
     public void keyPressed (KeyEvent e)
     {
-        switch (e.getKeyCode())
+        if (gameOver)
         {
-            case KeyEvent.VK_W ->
+            overlayGameOver.keyPressed (e);
+        }
+        else
+        {
+            switch (e.getKeyCode())
             {
-                giocatore.setSopra (true);
-            }
+                case KeyEvent.VK_W ->
+                {
+                    giocatore.setSopra (true);
+                }
 
-            case KeyEvent.VK_A ->
-            {
-                giocatore.setSinistra (true);
-            }
+                case KeyEvent.VK_A ->
+                {
+                    giocatore.setSinistra (true);
+                }
 
-            case KeyEvent.VK_S ->
-            {
-                giocatore.setSotto (true);
-            }
+                case KeyEvent.VK_S ->
+                {
+                    giocatore.setSotto (true);
+                }
 
-            case KeyEvent.VK_D ->
-            {
-                giocatore.setDestra (true);
-            }
+                case KeyEvent.VK_D ->
+                {
+                    giocatore.setDestra (true);
+                }
 
-            case KeyEvent.VK_SPACE ->
-            {
-                giocatore.setSalto (true);
-            }
+                case KeyEvent.VK_SPACE ->
+                {
+                    giocatore.setSalto (true);
+                }
 
-            case KeyEvent.VK_ESCAPE ->
-            {
-                inPausa = !inPausa;                             // piccola scappatoia per fare il contrario di quello che è in quel momento
+                case KeyEvent.VK_ESCAPE ->
+                {
+                    inPausa = !inPausa;                             // piccola scappatoia per fare il contrario di quello che è in quel momento
+                }
             }
         }
 
@@ -232,33 +260,54 @@ public class Playing extends Stato implements StatoMetodi
     @Override
     public void keyReleased(KeyEvent e)
     {
-        switch (e.getKeyCode())
+        if (!gameOver)
         {
-//            case KeyEvent.VK_W ->
-//            {
-//                giocatore.setSopra (false);
-//            }
-
-            case KeyEvent.VK_A ->
+            switch (e.getKeyCode())
             {
-                giocatore.setSinistra (false);
-            }
+                //            case KeyEvent.VK_W ->
+                //            {
+                //                giocatore.setSopra (false);
+                //            }
 
-//            case KeyEvent.VK_S ->
-//            {
-//                giocatore.setSotto (false);
-//            }
+                case KeyEvent.VK_A ->
+                {
+                    giocatore.setSinistra (false);
+                }
 
-            case KeyEvent.VK_D ->
-            {
-                giocatore.setDestra (false);
-            }
+                //            case KeyEvent.VK_S ->
+                //            {
+                //                giocatore.setSotto (false);
+                //            }
+
+                case KeyEvent.VK_D ->
+                {
+                    giocatore.setDestra (false);
+                }
 
 
-            case KeyEvent.VK_SPACE ->
-            {
-                giocatore.setSalto (false);
+                case KeyEvent.VK_SPACE ->
+                {
+                    giocatore.setSalto (false);
+                }
             }
         }
+    }
+
+    public void resettaTutto()
+    {
+        gameOver = false;
+        inPausa = false;
+        giocatore.resettaTutto ();
+        gestioneNemico.resettaTuttoNemici ();
+    }
+
+    public void controllaColpoNemico (Rectangle2D.Float attackBox)
+    {
+        gestioneNemico.controllaColpoNemico (attackBox);
+    }
+
+    public void setGameOver (boolean gameOver)
+    {
+        this.gameOver = gameOver;
     }
 }

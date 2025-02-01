@@ -6,6 +6,7 @@ import utilità.CaricaSalva;
 import static utilità.Costanti.CostantiNemico.*;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -47,11 +48,30 @@ public class GestioneNemico
     {
         for (Granchio granchio : granchi)
         {
-            g.drawImage(granchioArray [granchio.getStatoNemico()][granchio.getIndiceAni()], (int) (granchio.getHitbox().x) - xLvlOffset - GRANCHIO_DRAWOFFSET_X + granchio.xFlip(), (int) (granchio.getHitbox().y) - GRANCHIO_DRAWOFFSET_Y, LARGHEZZA_GRANCHIO * granchio.lFlip(), ALTEZZA_GRANCHIO,null);
+            if (granchio.isAttivo())
+            {
+                g.drawImage(granchioArray [granchio.getStatoNemico()][granchio.getIndiceAni()], (int) (granchio.getHitbox().x) - xLvlOffset - GRANCHIO_DRAWOFFSET_X + granchio.xFlip(), (int) (granchio.getHitbox().y) - GRANCHIO_DRAWOFFSET_Y, LARGHEZZA_GRANCHIO * granchio.lFlip(), ALTEZZA_GRANCHIO,null);
 
-//            granchio.drawHitBox(g, xLvlOffset);
+//                granchio.drawHitBox(g, xLvlOffset);
 
-            granchio.drawAttackBox (g, xLvlOffset);
+//                granchio.drawAttackBox (g, xLvlOffset);
+            }
+        }
+    }
+
+    public void controllaColpoNemico (Rectangle2D.Float attackBox)
+    {
+        for (Granchio granchio : granchi)
+        {
+            if (granchio.isAttivo())
+            {
+                if (attackBox.intersects (granchio.getHitbox()))
+                {
+                    granchio.ferisci (10);
+
+                    return;
+                }
+            }
         }
     }
 
@@ -66,6 +86,14 @@ public class GestioneNemico
             {
                 granchioArray [j][i]= temp.getSubimage(i * LARGHEZZA_GRANCHIO_DEFAULT , j * ALTEZZA_GRANCHIO_DEFAULT, LARGHEZZA_GRANCHIO_DEFAULT, ALTEZZA_GRANCHIO_DEFAULT);
             }
+        }
+    }
+
+    public void resettaTuttoNemici()
+    {
+        for (Granchio granchio : granchi)
+        {
+            granchio.resettaNemico ();
         }
     }
 }

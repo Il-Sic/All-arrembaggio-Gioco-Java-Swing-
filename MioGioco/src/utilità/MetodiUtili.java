@@ -102,7 +102,14 @@ public class MetodiUtili
 
     public static boolean isPavimento(Rectangle2D.Float hitbox, float xVel, int [][] datiLvl)
     {
-        return isSolido(hitbox.x + xVel, hitbox.y + hitbox.height + 1, datiLvl);
+        if (xVel > 0)
+        {
+            return isSolido(hitbox.x + xVel + hitbox.width, hitbox.y + hitbox.height + 1, datiLvl);
+        }
+        else
+        {
+            return isSolido(hitbox.x + xVel, hitbox.y + hitbox.height + 1, datiLvl);
+        }
     }
 
     public static boolean isCaselleTutteCalpestabili(int startX, int endX, int y,int[][] datiLvl)

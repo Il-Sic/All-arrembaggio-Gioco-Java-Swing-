@@ -2,6 +2,8 @@ package utilità;
 
 import main.Gioco;
 
+import static utilità.Costanti.CostantiNemico.GRANCHIO;
+
 public class Costanti
 {
     public static class CostantiNemico
@@ -23,7 +25,7 @@ public class Costanti
         public static final int GRANCHIO_DRAWOFFSET_X = (int) (26 * Gioco.SCALA);
         public static final int GRANCHIO_DRAWOFFSET_Y = (int) (9 * Gioco.SCALA);
 
-        public static int getContSprite (int tipoNemico, int statoNemico)
+        public static int GetContSprite (int tipoNemico, int statoNemico)
         {
             return switch (tipoNemico)
             {
@@ -48,6 +50,38 @@ public class Costanti
                 //                }
                 default -> throw new IllegalStateException("Tipo nemico sconosciuto: " + tipoNemico);
             };
+        }
+    }
+
+    public static int GetVitaMax (int tipoNemico)
+    {
+        switch (tipoNemico)
+        {
+            case GRANCHIO ->
+            {
+                return 10;
+            }
+
+            default ->
+            {
+                return 1;
+            }
+        }
+    }
+
+    public static int GetDannoNemico (int tipoNemico)
+    {
+        switch (tipoNemico)
+        {
+            case GRANCHIO ->
+            {
+                return 15;
+            }
+
+            default ->
+            {
+                return 0;
+            }
         }
     }
 

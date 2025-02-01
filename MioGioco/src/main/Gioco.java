@@ -30,6 +30,7 @@ public class Gioco implements Runnable
         initClassi();                               // precedenza (va messo prima)
         pannello = new PannelloGioco (this);
         finestra = new FinestraGioco (pannello);
+        pannello.setFocusable (true);
         pannello.requestFocus ();
 
         startGameLoop();

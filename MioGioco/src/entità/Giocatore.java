@@ -1,6 +1,7 @@
 package entità;
 
 import main.Gioco;
+import statigioco.Playing;
 import utilità.CaricaSalva;
 
 import java.awt.*;
@@ -38,7 +39,7 @@ public class Giocatore extends Entità
     private int yBarraStato = (int) (10 * Gioco.SCALA);
 
     private int larghezzaBarraVita = (int) (150 * Gioco.SCALA);
-    private int altezzaBarraVita= (int) (4 * Gioco.SCALA);
+    private int altezzaBarraVita = (int) (4 * Gioco.SCALA);
     private int xInizioBarraVita = (int) (34 * Gioco.SCALA);
     private int yInizioBarraVita = (int) (14 * Gioco.SCALA);
 
@@ -48,13 +49,16 @@ public class Giocatore extends Entità
 
     // Box attacco
     private Rectangle2D.Float attackBox;
-
     private int xFlip = 0;
     private int lFlip = 1;
 
-    public Giocatore (float x, float y, int larghezza, int altezza)
+    private boolean attaccoControllato;
+    private Playing playing;
+
+    public Giocatore (float x, float y, int larghezza, int altezza, Playing playing)
     {
         super (x, y, larghezza, altezza);
+        this.playing = playing;
         caricaAnimazioni ();
         initHitBox (x, y, (int) (20 * Gioco.SCALA), (int) (27 * Gioco.SCALA));
         initAttackBox ();
@@ -68,11 +72,36 @@ public class Giocatore extends Entità
     public void update ()
     {
         updateBarraVita ();
+
+        if (vitaCorrente <= 0)
+        {
+            playing.setGameOver (true);
+            return;
+        }
+
         updateAttackBox ();
 
         updatePos ();
+
+        if (attacco)
+        {
+            controllaAttacco ();
+        }
+
         updateTickAnimazioni ();
         setAnimazione ();
+    }
+
+    private void controllaAttacco()
+    {
+        if (attaccoControllato || indiceAni != 1)
+        {
+            return;
+        }
+
+        attaccoControllato = true;
+
+        playing.controllaColpoNemico (attackBox);
     }
 
     private void updateAttackBox()
@@ -89,16 +118,16 @@ public class Giocatore extends Entità
         attackBox.y = hitbox.y + (Gioco.SCALA * 10);
     }
 
-    private void updateBarraVita()
+    private void updateBarraVita ()
     {
         larghezzaVita = (int) ((vitaCorrente / (float) vitaMax) * larghezzaBarraVita);
     }
 
-    public void cambiaSalute (int valore)
+    public void cambiaVita (int valore)
     {
         vitaCorrente += valore;
 
-        if (vitaCorrente <= vitaMax)
+        if (vitaCorrente <= 0)
         {
             vitaCorrente = 0;
 
@@ -112,10 +141,10 @@ public class Giocatore extends Entità
 
     public void render (Graphics g, int lvlOffset)
     {
-        g.drawImage (animazioni [azioneGiocatore][indiceAni],  (int) (hitbox.x - xDrawOffset) - lvlOffset + xFlip,  (int) (hitbox.y - yDrawOffset) , larghezza * lFlip, altezza, null);              // qui modifico l' immagine e la sua dimensione
+        g.drawImage (animazioni [azioneGiocatore][indiceAni], (int) (hitbox.x - xDrawOffset) - lvlOffset + xFlip,  (int) (hitbox.y - yDrawOffset) , larghezza * lFlip, altezza, null);              // qui modifico l' immagine e la sua dimensione
 //        drawHitBox (g, lvlOffset);
 
-        drawAttackBox (g, lvlOffset);
+//        drawAttackBox (g, lvlOffset);
 
         drawUI (g);
     }
@@ -130,7 +159,7 @@ public class Giocatore extends Entità
     {
         g.drawImage (barraStatoImg, xBarraStato, yBarraStato, larghezzaBarraStato, altezzaBarraStato,null);
         g.setColor (Color.red);
-        g.fillRect (xInizioBarraVita + xBarraStato, yInizioBarraVita + yBarraStato, larghezzaBarraVita, altezzaBarraVita);
+        g.fillRect (xInizioBarraVita + xBarraStato, yInizioBarraVita + yBarraStato, larghezzaVita, altezzaBarraVita);
     }
 
 
@@ -142,6 +171,7 @@ public class Giocatore extends Entità
     private void updateTickAnimazioni ()
     {
         tickAni ++;
+
         if (tickAni >= velAni)                      // quando è uguale o supera cambia immagine simulando un animazione
         {
             tickAni = 0;
@@ -151,6 +181,7 @@ public class Giocatore extends Entità
             {
                 indiceAni = 0;
                 attacco = false;
+                attaccoControllato = false;
             }
         }
     }
@@ -183,6 +214,13 @@ public class Giocatore extends Entità
         if (attacco)
         {
             azioneGiocatore = ATTACCO;
+
+            if (iniziaAni != ATTACCO)
+            {
+                indiceAni = 1;
+                tickAni = 0;
+                return;
+            }
         }
 
         if (iniziaAni != azioneGiocatore)
@@ -310,11 +348,11 @@ public class Giocatore extends Entità
 
         animazioni = new BufferedImage [7][8];              // y e x dell' immagine
 
-        for (int i = 0; i < animazioni.length; i ++)
+        for (int j = 0; j < animazioni.length; j ++)
         {
-            for (int j = 0; j < animazioni[i].length; j ++)
+            for (int i = 0; i < animazioni[j].length; i ++)
             {
-                animazioni [i][j] = img.getSubimage (j * 64, i * 40, 64, 40);               // j è la x, i è la y dell' immagine
+                animazioni [j][i] = img.getSubimage (i * 64, j * 40, 64, 40);               // j è la y, i è la x dell' immagine
             }
         }
 
@@ -388,5 +426,22 @@ public class Giocatore extends Entità
     public void setSalto (boolean salto)
     {
         this.salto = salto;
+    }
+
+    public void resettaTutto()
+    {
+        resetDirBooleans();
+        inAria = false;
+        attacco = false;
+        movimento = false;
+        azioneGiocatore = IDLE;
+        vitaCorrente = vitaMax;
+        hitbox.x = x;
+        hitbox.y = y;
+
+        if (!isEntitàSulPavimento(hitbox, datiLvl))
+        {
+            inAria = true;
+        }
     }
 }

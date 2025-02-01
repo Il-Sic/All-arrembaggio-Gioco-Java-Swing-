@@ -170,7 +170,8 @@ public class OverlayPausa
         {
             if (rigiocaB.isMousePressed ())
             {
-
+                playing.resettaTutto  ();
+                playing.riprendiGioco ();
             }
         }
         else if (isIn (e, riprendiB))

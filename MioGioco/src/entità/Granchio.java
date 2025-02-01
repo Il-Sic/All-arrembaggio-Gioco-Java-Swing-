@@ -21,7 +21,7 @@ public class Granchio extends Nemico
         initAttackBox ();
     }
 
-    private void initAttackBox()
+    private void initAttackBox ()
     {
         attackBox = new Rectangle2D.Float (x, y, (int) (82 * Gioco.SCALA), (int) (19 * Gioco.SCALA));
         xAttackBoxOffset = (int) (30 * Gioco.SCALA);
@@ -29,18 +29,18 @@ public class Granchio extends Nemico
 
     public void update (int [][] datiLvl, Giocatore giocatore)
     {
-        updateMove(datiLvl, giocatore);
+        updateComportamento (datiLvl, giocatore);
         updateTickAnimazione();
         updateAttackBox ();
     }
 
-    private void updateAttackBox()
+    private void updateAttackBox ()
     {
         attackBox.x = hitbox.x - xAttackBoxOffset;
         attackBox.y = hitbox.y;
     }
 
-    public void updateMove (int [][] datiLvl, Giocatore giocatore)
+    public void updateComportamento (int [][] datiLvl, Giocatore giocatore)
     {
         if (primoUpdate)
         {
@@ -61,15 +61,28 @@ public class Granchio extends Nemico
                 {
                     if (puòVedereGiocatore(datiLvl, giocatore))
                     {
-                        giraVersoGiocatore (giocatore);
-                    }
+                        giraVersoGiocatore(giocatore);
 
-                    if (isGiocatoreNelRaggioPerAttacco(giocatore))
-                    {
-                        nuovoStato(ATTACCO);
+                        if (isGiocatoreNelRaggioPerAttacco(giocatore))
+                        {
+                            nuovoStato(ATTACCO);
+                        }
                     }
 
                     muovi (datiLvl);
+                }
+
+                case ATTACCO ->
+                {
+                    if (indiceAni == 0)
+                    {
+                        attaccoControllato = false;
+                    }
+
+                    if (indiceAni == 3 && !attaccoControllato)
+                    {
+                        controllaColpoGiocatore (attackBox, giocatore);
+                    }
                 }
             }
         }
