@@ -3,8 +3,11 @@ package main;
 import statigioco.Menu;
 import statigioco.Playing;
 import statigioco.StatoGioco;
+import utilità.CaricaSalva;
 
 import java.awt.*;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class Gioco implements Runnable
 {
@@ -25,9 +28,10 @@ public class Gioco implements Runnable
     public static final int LARGHEZZA_GIOCO = DIMENSIONE_CASELLA * LARGHEZZA_CASELLA;
     public static final int ALTEZZA_GIOCO = DIMENSIONE_CASELLA * ALTEZZA_CASELLA;
 
-    public Gioco ()
+    public Gioco () throws URISyntaxException, IOException
     {
         initClassi();                               // precedenza (va messo prima)
+
         pannello = new PannelloGioco (this);
         finestra = new FinestraGioco (pannello);
         pannello.setFocusable (true);
@@ -36,7 +40,7 @@ public class Gioco implements Runnable
         startGameLoop();
     }
 
-    private void initClassi ()
+    private void initClassi () throws URISyntaxException, IOException
     {
         menu = new Menu (this);
         playing = new Playing (this);

@@ -1,23 +1,19 @@
 package utilità;
 
-import entità.Granchio;
-import main.Gioco;
-
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-
-import static utilità.Costanti.CostantiNemico.GRANCHIO;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 public class CaricaSalva
 {
     public static final String ALTLANTE_GIOCATORE = "player_sprites.png";
     public static final String ALTLANTE_LIVELLO = "outside_sprites.png";
-    //  public static final String DATI_LIVELLO_1 = "level_one_data.png";
-    public static final String DATI_LIVELLO_1 = "level_one_data_long.png";
+//    public static final String DATI_LIVELLO_1 = "level_one_data.png";
+//    public static final String DATI_LIVELLO_1 = "level_one_data_long.png";
     public static final String MENU_BUTTONS = "button_atlas.png";
     public static final String MENU_BACKGROUND = "menu_background.png";
     public static final String MENU_SFONDO_FINESTRA = "Designer-5.png";
@@ -30,6 +26,7 @@ public class CaricaSalva
     public static final String PICCOLE_NUVOLE = "piccole_nuvole.png";
     public static final String GRANDI_NUVOLE = "grandi_nuvole.png";
     public static final String BARRA_STATO = "health_power_bar.png";
+    public static final String LIVELLO_COMPLETATO = "completed_sprite.png";
 
     public static BufferedImage GetAtltanteSprite (String nomeFile)                        // restituisce un immagine memorizzata nel buffer
     {
@@ -60,47 +57,37 @@ public class CaricaSalva
         return img;
     }
 
-    public static ArrayList <Granchio> GetGranchi ()
+    public static BufferedImage [] GetTuttiLivelli () throws URISyntaxException, IOException
     {
-        BufferedImage img = GetAtltanteSprite (DATI_LIVELLO_1);
-        ArrayList <Granchio> lista = new ArrayList <> ();
+        URL url = CaricaSalva.class.getResource ("/Livellini");
+        File file = null;
 
-        for (int j = 0; j < img.getHeight(); j ++)
+        assert url != null;
+        file = new File (url.toURI ());
+
+        File [] files = file.listFiles();
+
+        assert files != null;
+        File [] filesOrdinati = new File [files.length];
+
+        for (int i = 0; i < filesOrdinati.length; i++)
         {
-            for (int i = 0; i < img.getWidth(); i ++)
+            for (File value : files)
             {
-                Color color = new Color (img.getRGB (i, j));
-                int valore = color.getGreen();
-                if (valore == GRANCHIO)
+                if (value.getName().equals((i + 1) + ".png"))
                 {
-                    lista.add (new Granchio (i * Gioco.DIMENSIONE_CASELLA, j * Gioco.DIMENSIONE_CASELLA));
+                    filesOrdinati[i] = value;
                 }
             }
         }
 
-        return lista;
-    }
+        BufferedImage[] imgs = new BufferedImage [filesOrdinati.length];
 
-    public static int [][] GetDatiLivello ()
-    {
-        BufferedImage img = GetAtltanteSprite (DATI_LIVELLO_1);
-
-        int [][] datiLvl = new int [img.getHeight ()][img.getWidth ()];
-
-        for (int j = 0; j < img.getHeight(); j ++)
+        for (int i = 0; i < imgs.length; i ++)
         {
-            for (int i = 0; i < img.getWidth(); i ++)
-            {
-                Color color = new Color (img.getRGB (i, j));
-                int valore = color.getRed();
-                if (valore >= 48)
-                {
-                    valore = 0;
-                }
-                datiLvl [j][i] = valore;
-            }
+            imgs [i] = ImageIO.read (filesOrdinati [i]);
         }
 
-        return datiLvl;
+        return imgs;
     }
 }

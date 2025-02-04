@@ -230,6 +230,15 @@ public class Giocatore extends Entità
 
     }
 
+    public void setSpawn (Point spawn)
+    {
+        this.x = spawn.x;
+        this.y = spawn.y;
+
+        hitbox.x = x;
+        hitbox.y = y;
+    }
+
     private void resetTickAni ()
     {
         tickAni = 0;

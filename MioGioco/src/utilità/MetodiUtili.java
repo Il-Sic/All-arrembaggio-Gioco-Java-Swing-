@@ -1,8 +1,14 @@
 package utilità;
 
+import entità.Granchio;
 import main.Gioco;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+
+import static utilità.Costanti.CostantiNemico.GRANCHIO;
 
 public class MetodiUtili
 {
@@ -143,5 +149,65 @@ public class MetodiUtili
         {
             return isCaselleTutteCalpestabili (primaCasellaX, secondaCasellaX, casellaY, datiLvl);
         }
+    }
+
+    public static int [][] GetDatiLivello (BufferedImage img)
+    {
+        int [][] datiLvl = new int [img.getHeight ()][img.getWidth ()];
+
+        for (int j = 0; j < img.getHeight(); j ++)
+        {
+            for (int i = 0; i < img.getWidth(); i ++)
+            {
+                Color color = new Color (img.getRGB (i, j));
+                int valore = color.getRed();
+                if (valore >= 48)
+                {
+                    valore = 0;
+                }
+                datiLvl [j][i] = valore;
+            }
+        }
+
+        return datiLvl;
+    }
+
+    public static ArrayList<Granchio> GetGranchi (BufferedImage img)
+    {
+        ArrayList <Granchio> lista = new ArrayList <> ();
+
+        for (int j = 0; j < img.getHeight(); j ++)
+        {
+            for (int i = 0; i < img.getWidth(); i ++)
+            {
+                Color color = new Color (img.getRGB (i, j));
+                int valore = color.getGreen();
+                if (valore == GRANCHIO)
+                {
+                    lista.add (new Granchio (i * Gioco.DIMENSIONE_CASELLA, j * Gioco.DIMENSIONE_CASELLA));
+                }
+            }
+        }
+
+        return lista;
+    }
+
+    public static Point GetSpawnGiocatore (BufferedImage img)
+    {
+        for (int j = 0; j < img.getHeight (); j ++)
+        {
+            for (int i = 0; i < img.getWidth (); i ++)
+            {
+                Color color = new Color (img.getRGB (i, j));
+                int valore = color.getGreen();
+
+                if (valore == 100)
+                {
+                    return new Point (i * Gioco.DIMENSIONE_CASELLA, j * Gioco.DIMENSIONE_CASELLA);
+                }
+            }
+        }
+
+        return new Point (1 * Gioco.DIMENSIONE_CASELLA, 1 * Gioco.DIMENSIONE_CASELLA);
     }
 }

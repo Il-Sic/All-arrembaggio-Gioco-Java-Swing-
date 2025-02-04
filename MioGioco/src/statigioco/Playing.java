@@ -5,6 +5,7 @@ import entità.Giocatore;
 import livelli.GestioneLivello;
 import main.Gioco;
 import ui.OverlayGameOver;
+import ui.OverlayLivelloCompletato;
 import ui.OverlayPausa;
 import utilità.CaricaSalva;
 
@@ -13,6 +14,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Random;
 
 import static utilità.Costanti.Ambiente.*;
@@ -24,22 +27,25 @@ public class Playing extends Stato implements StatoMetodi
     private GestioneLivello gestioneLivello;
     private OverlayPausa overlayPausa;
     private OverlayGameOver overlayGameOver;
+    private OverlayLivelloCompletato overlayLivelloCompletato;
     private boolean inPausa = false;
 
     private int xLvlOffset;
     private int bordoSin = (int) (0.2 * Gioco.LARGHEZZA_GIOCO);
     private int bordoDes = (int) (0.8 * Gioco.LARGHEZZA_GIOCO);
-    private int larghezzaCaselleLvl  = CaricaSalva.GetDatiLivello () [0].length;
-    private int maxCaselleOffset = larghezzaCaselleLvl - Gioco.LARGHEZZA_CASELLA;
-    private int maxXLvlOffset = maxCaselleOffset * Gioco.DIMENSIONE_CASELLA;
+//    private int larghezzaCaselleLvl  = CaricaSalva.GetDatiLivello () [0].length;
+//    private int maxCaselleOffset = larghezzaCaselleLvl - Gioco.LARGHEZZA_CASELLA;
+//    private int maxXLvlOffset = maxCaselleOffset * Gioco.DIMENSIONE_CASELLA;
+    private int maxXLvlOffset;
 
     private BufferedImage immagineBackgound, grandeNuvola, piccolaNuvola;
     private int [] posizionePiccolaNuvola;
     private Random rand = new Random();
 
-    private boolean gameOver;
+    private boolean gameOver = false;
+    private boolean lvlCompletato = false;
 
-    public Playing (Gioco gioco)
+    public Playing (Gioco gioco) throws URISyntaxException, IOException
     {
         super (gioco);
         initClassi ();
@@ -53,16 +59,41 @@ public class Playing extends Stato implements StatoMetodi
         {
             posizionePiccolaNuvola [i] = (int) (90 * Gioco.SCALA) + rand.nextInt ((int) (100 * Gioco.SCALA));
         }
+
+        calcolaLvlOffset ();
+
+        caricaInizioLivello ();
     }
 
-    private void initClassi ()
+    public void caricaLivelloSuccessivo ()
+    {
+        resettaTutto ();
+        gestioneLivello.caricaLivelloSuccessivo ();
+        giocatore.setSpawn (gestioneLivello.getLivelloCorrente ().getSpawnGiocatore ());
+    }
+
+    private void caricaInizioLivello()
+    {
+        gestioneNemico.caricaNemici (gestioneLivello.getLivelloCorrente ());
+    }
+
+    private void calcolaLvlOffset()
+    {
+        maxXLvlOffset = gestioneLivello.getLivelloCorrente ().getLvlOffset ();
+    }
+
+    private void initClassi () throws URISyntaxException, IOException
     {
         gestioneLivello = new GestioneLivello (gioco);
         gestioneNemico = new GestioneNemico (this);
+
         giocatore = new Giocatore (200, 200, (int) (64 * Gioco.SCALA), (int) (40 * Gioco.SCALA), this);
-        giocatore.caricaDatiLvl (gestioneLivello.getLivelloCorrente().getDatiLvl());
+        giocatore.caricaDatiLvl (gestioneLivello.getLivelloCorrente ().getDatiLvl ());
+        giocatore.setSpawn (gestioneLivello.getLivelloCorrente ().getSpawnGiocatore ());
+
         overlayPausa = new OverlayPausa (this);
         overlayGameOver = new OverlayGameOver (this);
+        overlayLivelloCompletato = new OverlayLivelloCompletato (this);
     }
 
     public void windowFocusLost ()
@@ -83,16 +114,20 @@ public class Playing extends Stato implements StatoMetodi
     @Override
     public void update ()
     {
-        if (!inPausa && !gameOver)
+        if (inPausa)
+        {
+            overlayPausa.update();
+        }
+        else if (lvlCompletato)
+        {
+            overlayLivelloCompletato.update();
+        }
+        else if (!gameOver)
         {
             gestioneLivello.update ();
             giocatore.update ();
             gestioneNemico.update (gestioneLivello.getLivelloCorrente().getDatiLvl(), giocatore);
             controllaVicinoBordo ();
-        }
-        else
-        {
-            overlayPausa.update ();
         }
     }
 
@@ -136,23 +171,27 @@ public class Playing extends Stato implements StatoMetodi
     @Override
     public void draw (Graphics g)
     {
-        g.drawImage(immagineBackgound, 0,0, Gioco.LARGHEZZA_GIOCO, Gioco.ALTEZZA_GIOCO, null);
+        g.drawImage(immagineBackgound, 0, 0, Gioco.LARGHEZZA_GIOCO, Gioco.ALTEZZA_GIOCO, null);
 
-        drawNuvole (g);
+        drawNuvole(g);
 
-        gestioneLivello.draw (g, xLvlOffset);
-        giocatore.render (g, xLvlOffset);
-        gestioneNemico.draw (g, xLvlOffset);
+        gestioneLivello.draw(g, xLvlOffset);
+        giocatore.render(g, xLvlOffset);
+        gestioneNemico.draw(g, xLvlOffset);
 
         if (inPausa)
         {
-            g.setColor (new Color (0, 0, 0, 150));
-            g.fillRect (0, 0, Gioco.LARGHEZZA_GIOCO, Gioco.ALTEZZA_GIOCO);
-            overlayPausa.draw (g);
+            g.setColor(new Color(0, 0, 0, 150));
+            g.fillRect(0, 0, Gioco.LARGHEZZA_GIOCO, Gioco.ALTEZZA_GIOCO);
+            overlayPausa.draw(g);
         }
         else if (gameOver)
         {
-            overlayGameOver.draw (g);
+            overlayGameOver.draw(g);
+        }
+        else if (lvlCompletato)
+        {
+            overlayLivelloCompletato.draw (g);
         }
     }
 
@@ -177,6 +216,10 @@ public class Playing extends Stato implements StatoMetodi
             {
                 overlayPausa.mousePressed (e);
             }
+            else if (lvlCompletato)
+            {
+                overlayLivelloCompletato.mousePressed(e);
+            }
         }
     }
 
@@ -189,6 +232,10 @@ public class Playing extends Stato implements StatoMetodi
             {
                 overlayPausa.mouseReleased (e);
             }
+            else if (lvlCompletato)
+            {
+                overlayLivelloCompletato.mouseReleased (e);
+            }
         }
     }
 
@@ -200,6 +247,10 @@ public class Playing extends Stato implements StatoMetodi
             if (inPausa)
             {
                 overlayPausa.mouseMoved (e);
+            }
+            else if (lvlCompletato)
+            {
+                overlayLivelloCompletato.mouseMoved (e);
             }
         }
     }
@@ -297,6 +348,7 @@ public class Playing extends Stato implements StatoMetodi
     {
         gameOver = false;
         inPausa = false;
+        lvlCompletato = false;
         giocatore.resettaTutto ();
         gestioneNemico.resettaTuttoNemici ();
     }
@@ -309,5 +361,20 @@ public class Playing extends Stato implements StatoMetodi
     public void setGameOver (boolean gameOver)
     {
         this.gameOver = gameOver;
+    }
+
+    public GestioneNemico getGestioneNemico ()
+    {
+        return gestioneNemico;
+    }
+
+    public void setMaxLvlOffset (int lvlOffset)
+    {
+        this.maxXLvlOffset = lvlOffset;
+    }
+
+    public void setLivelloCompletato (boolean livelloCompletato)
+    {
+        this.lvlCompletato = livelloCompletato;
     }
 }

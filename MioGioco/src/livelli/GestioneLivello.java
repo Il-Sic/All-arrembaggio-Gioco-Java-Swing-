@@ -1,23 +1,55 @@
 package livelli;
 
 import main.Gioco;
+import statigioco.StatoGioco;
 import utilità.CaricaSalva;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 public class GestioneLivello
 {
     private Gioco gioco;
     private BufferedImage [] spriteLivello;
-    private Livello livelloUno;
+    private ArrayList <Livello> livelli;
+    private int indiceLvl = 0;
 
-    public GestioneLivello (Gioco gioco)
+    public GestioneLivello (Gioco gioco) throws URISyntaxException, IOException
     {
         this.gioco = gioco;
-        //spriteLivello = CaricaSalva.GetAtltanteSprites (CaricaSalva.ALTLANTE_LIVELLO);
         importaSpritesEsterni ();
-        livelloUno = new Livello (CaricaSalva.GetDatiLivello());
+        livelli = new ArrayList<>();
+        costruisciTuttiLivelli ();
+    }
+
+    public void caricaLivelloSuccessivo ()
+    {
+        indiceLvl ++;
+
+        if (indiceLvl >= livelli.size())
+        {
+            indiceLvl = 0;
+            System.out.println("Hai finito il gioco! Complimenti!");
+            StatoGioco.stato = StatoGioco.MENU;
+        }
+
+        Livello nuovoLivello = livelli.get (indiceLvl);
+        gioco.getPlaying ().getGestioneNemico ().caricaNemici (nuovoLivello);
+        gioco.getPlaying ().getGiocatore ().caricaDatiLvl (nuovoLivello.getDatiLvl ());
+        gioco.getPlaying ().setMaxLvlOffset (nuovoLivello.getLvlOffset ());
+    }
+
+    private void costruisciTuttiLivelli() throws URISyntaxException, IOException
+    {
+        BufferedImage [] tuttiLivelli = CaricaSalva.GetTuttiLivelli();
+
+        for (BufferedImage img : tuttiLivelli)
+        {
+            livelli.add (new Livello (img));
+        }
     }
 
     private void importaSpritesEsterni()
@@ -39,9 +71,9 @@ public class GestioneLivello
     {
         for (int j = 0; j < Gioco.ALTEZZA_CASELLA; j ++)
         {
-            for (int i = 0; i < livelloUno.getDatiLvl () [0].length; i ++)
+            for (int i = 0; i < livelli.get (indiceLvl).getDatiLvl () [0].length; i ++)
             {
-                int indice = livelloUno.getIndiceSprite (i, j);
+                int indice = livelli.get (indiceLvl).getIndiceSprite (i, j);
                 g.drawImage (spriteLivello [indice], Gioco.DIMENSIONE_CASELLA * i - lvlOffset, Gioco.DIMENSIONE_CASELLA * j, Gioco.DIMENSIONE_CASELLA, Gioco.DIMENSIONE_CASELLA, null);
             }
         }
@@ -52,6 +84,11 @@ public class GestioneLivello
 
     public Livello getLivelloCorrente ()
     {
-        return livelloUno;
+        return livelli.get (indiceLvl);
+    }
+
+    public int getNumeroLivelli ()
+    {
+        return livelli.size ();
     }
 }

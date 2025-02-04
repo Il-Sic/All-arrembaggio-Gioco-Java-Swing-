@@ -1,5 +1,6 @@
 package entità;
 
+import livelli.Livello;
 import statigioco.Playing;
 import utilità.CaricaSalva;
 
@@ -21,20 +22,29 @@ public class GestioneNemico
         this.playing = playing;
 
         caricaImmaginiNemico ();
-
-        aggiungiNemici ();
     }
 
-    private void aggiungiNemici()
+    public void caricaNemici (Livello livello)
     {
-        granchi = CaricaSalva.GetGranchi();
+        granchi = livello.getGranchi ();
     }
 
     public void update (int [][] datiLvl, Giocatore giocatore)
     {
+        boolean isAttivoQualcosa = false;
+
         for (Granchio granchio : granchi)
         {
-            granchio.update(datiLvl, giocatore);
+            if (granchio.isAttivo ())
+            {
+                granchio.update(datiLvl, giocatore);
+                isAttivoQualcosa = true;
+            } 
+        }
+
+        if (!isAttivoQualcosa)
+        {
+            playing.setLivelloCompletato (true);
         }
     }
 
