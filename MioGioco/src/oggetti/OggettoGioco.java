@@ -5,7 +5,7 @@ import main.Gioco;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
-import static utilità.Costanti.CostantiGiocatore.GetSpriteCont;
+import static utilità.Costanti.CostantiOggetto.GetSpriteCont;
 import static utilità.Costanti.CostantiOggetto.BARILE;
 import static utilità.Costanti.CostantiOggetto.CASSA;
 import static utilità.Costanti.VEL_ANI;

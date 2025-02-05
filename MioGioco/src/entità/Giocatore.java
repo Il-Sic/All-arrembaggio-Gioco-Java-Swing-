@@ -86,6 +86,7 @@ public class Giocatore extends Entità
         if (movimento)
         {
             controllaPozioneToccata ();
+            controllaSpuntoniToccati ();
         }
 
         if (attacco)
@@ -97,9 +98,19 @@ public class Giocatore extends Entità
         setAnimazione ();
     }
 
+    private void controllaSpuntoniToccati ()
+    {
+        playing.controllaSpuntoniToccati (this);
+    }
+
     private void controllaPozioneToccata()
     {
         playing.controllaPozioneToccata (hitbox);
+    }
+
+    public void killa ()
+    {
+        vitaCorrente = 0;
     }
 
     private void controllaAttacco()

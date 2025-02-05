@@ -177,8 +177,11 @@ public class Costanti
         public static final int POZIONE_BLU = 1;
         public static final int BARILE = 2;
         public static final int CASSA = 3;
+        public static final int SPUNTONE = 4;
+
         public static final int VALORE_POZIONE_ROSSA = 15;
         public static final int VALORE_POZIONE_BLU = 10;
+
         public static final int LARGHEZZA_CONTENITORE_DEFAULT = 40;
         public static final int ALTEZZA_CONTENITORE_DEFAULT = 30;
         public static final int LARGHEZZA_CONTENITORE = (int) (Gioco.SCALA * LARGHEZZA_CONTENITORE_DEFAULT);
@@ -187,6 +190,10 @@ public class Costanti
         public static final int ALTEZZA_POZIONE_DEFAULT = 16;
         public static final int LARGHEZZA_POZIONE = (int) (Gioco.SCALA * LARGHEZZA_POZIONE_DEFAULT);
         public static final int ALTEZZA_POZIONE = (int) (Gioco.SCALA * ALTEZZA_POZIONE_DEFAULT);
+        public static final int LARGHEZZA_SPUNTONE_DEFAULT = 32;
+        public static final int ALTEZZA_SPUNTONE_DEFAULT = 32;
+        public static final int LARGHEZZA_SPUNTONE = (int) (Gioco.SCALA * LARGHEZZA_SPUNTONE_DEFAULT);
+        public static final int ALTEZZA_SPUNTONE = (int) (Gioco.SCALA * ALTEZZA_SPUNTONE_DEFAULT);
 
         public static int GetSpriteCont (int tipoOggetto)
         {

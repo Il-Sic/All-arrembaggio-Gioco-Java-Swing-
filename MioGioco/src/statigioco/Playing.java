@@ -366,6 +366,11 @@ public class Playing extends Stato implements StatoMetodi
         gestoreOggetto.controllaOggettoToccato (hitbox);
     }
 
+    public void controllaSpuntoniToccati (Giocatore giocatore)
+    {
+        gestoreOggetto.controllaSpuntoniToccati (giocatore);
+    }
+
     public void setGameOver (boolean gameOver)
     {
         this.gameOver = gameOver;
@@ -379,6 +384,11 @@ public class Playing extends Stato implements StatoMetodi
     public GestoreOggetto getGestoreOggetto ()
     {
         return gestoreOggetto;
+    }
+
+    public GestioneLivello getGestioneLivello ()
+    {
+        return gestioneLivello;
     }
 
     public void setMaxLvlOffset (int lvlOffset)

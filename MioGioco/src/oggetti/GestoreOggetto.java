@@ -1,5 +1,6 @@
 package oggetti;
 
+import entità.Giocatore;
 import livelli.Livello;
 import statigioco.Playing;
 import utilità.CaricaSalva;
@@ -15,14 +16,28 @@ public class GestoreOggetto
 {
 
     private Playing playing;
-    private BufferedImage[][] imgsPozione, imgsContenitore;
-    private ArrayList<Pozione> pozioni;
-    private ArrayList<ContenitoreGioco> contenitori;
+    private BufferedImage [][] imgsPozione, imgsContenitore;
+    private BufferedImage imgSpuntone;
+
+    private ArrayList <Pozione> pozioni;
+    private ArrayList <ContenitoreGioco> contenitori;
+    private ArrayList <Spuntone> spuntoni;
 
     public GestoreOggetto (Playing playing)
     {
         this.playing = playing;
         caricaImgs ();
+    }
+
+    public void controllaSpuntoniToccati (Giocatore giocatore)
+    {
+        for (Spuntone s : spuntoni)
+        {
+            if (s.getHitbox().intersects (giocatore.getHitbox()))
+            {
+                giocatore.killa ();
+            }
+        }
     }
 
     public void controllaOggettoToccato (Rectangle2D.Float hitbox)
@@ -56,7 +71,7 @@ public class GestoreOggetto
     {
         for (ContenitoreGioco contGio : contenitori)
         {
-            if (contGio.isAttivo())
+            if (contGio.isAttivo() && !contGio.faiAnimazione)
             {
                 if (contGio.getHitbox().intersects(attackbox))
                 {
@@ -73,8 +88,9 @@ public class GestoreOggetto
 
     public void caricaOggetti (Livello nuovoLivello)
     {
-        pozioni = nuovoLivello.getPozioni ();
-        contenitori = nuovoLivello.getContenitori ();
+        pozioni = new ArrayList <> (nuovoLivello.getPozioni ());
+        contenitori = new ArrayList <> (nuovoLivello.getContenitori ());
+        spuntoni = nuovoLivello.getSpuntoni();
     }
 
     private void caricaImgs ()
@@ -100,6 +116,8 @@ public class GestoreOggetto
                 imgsContenitore[j][i] = containerSprite.getSubimage (40 * i, 30 * j, 40, 30);
             }
         }
+
+        imgSpuntone = CaricaSalva.GetAtltanteSprite (CaricaSalva.ATLANTE_TRAPPOLA);
     }
 
     public void update ()
@@ -123,8 +141,17 @@ public class GestoreOggetto
 
     public void draw (Graphics g, int xLvlOffset)
     {
-        drawPozioni(g, xLvlOffset);
-        drawContenitori(g, xLvlOffset);
+        drawPozioni (g, xLvlOffset);
+        drawContenitori (g, xLvlOffset);
+        drawTrappole (g, xLvlOffset);
+    }
+
+    private void drawTrappole(Graphics g, int xLvlOffset)
+    {
+        for (Spuntone s : spuntoni)
+        {
+            g.drawImage (imgSpuntone, (int) (s.getHitbox ().x - xLvlOffset), (int) (s.getHitbox().y - s.getYDrawOffset ()), LARGHEZZA_SPUNTONE, ALTEZZA_SPUNTONE, null);
+        }
     }
 
     private void drawContenitori (Graphics g, int xLvlOffset)
@@ -165,6 +192,8 @@ public class GestoreOggetto
 
     public void resettaTuttiOggetti ()
     {
+        caricaOggetti (playing.getGestioneLivello().getLivelloCorrente());
+
         for (Pozione p : pozioni)
         {
             p.resetta();

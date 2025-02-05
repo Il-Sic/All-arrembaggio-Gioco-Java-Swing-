@@ -4,6 +4,7 @@ import entità.Granchio;
 import main.Gioco;
 import oggetti.ContenitoreGioco;
 import oggetti.Pozione;
+import oggetti.Spuntone;
 import utilità.MetodiUtili;
 
 import java.awt.*;
@@ -22,6 +23,8 @@ public class Livello
 
     private ArrayList <Pozione> pozioni;
     private ArrayList <ContenitoreGioco> contenitori;
+    private ArrayList <Spuntone> spuntoni;
+
 
     private int larghezzaCaselleLvl;
     private int maxCaselleOffset ;
@@ -37,8 +40,14 @@ public class Livello
         creaNemici ();
         creaPozioni ();
         creaContenitori ();
+        creaSpuntoni ();
         calcolaLvlOffset ();
         calcolaSpawnGiocatore ();
+    }
+
+    private void creaSpuntoni()
+    {
+        spuntoni = MetodiUtili.GetSpuntoni (img);
     }
 
     private void creaContenitori()
@@ -108,5 +117,10 @@ public class Livello
     public ArrayList <ContenitoreGioco> getContenitori ()
     {
         return contenitori;
+    }
+
+    public ArrayList <Spuntone> getSpuntoni ()
+    {
+        return spuntoni;
     }
 }

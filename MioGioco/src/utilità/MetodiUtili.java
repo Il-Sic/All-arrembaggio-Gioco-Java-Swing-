@@ -4,6 +4,7 @@ import entità.Granchio;
 import main.Gioco;
 import oggetti.ContenitoreGioco;
 import oggetti.Pozione;
+import oggetti.Spuntone;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -252,5 +253,27 @@ public class MetodiUtili
             }
         }
         return contenitori;
+    }
+
+    public static ArrayList <Spuntone> GetSpuntoni (BufferedImage img)
+    {
+
+        ArrayList <Spuntone> spuntoni = new ArrayList<>();
+
+        for (int j = 0; j < img.getHeight(); j++)
+        {
+            for (int i = 0; i < img.getWidth(); i++)
+            {
+                Color color = new Color(img.getRGB(i, j));
+                int valore = color.getBlue();
+
+                if (valore == SPUNTONE)
+                {
+                    spuntoni.add (new Spuntone(i * Gioco.DIMENSIONE_CASELLA, j * Gioco.DIMENSIONE_CASELLA, SPUNTONE));
+                }
+            }
+        }
+
+        return spuntoni;
     }
 }
