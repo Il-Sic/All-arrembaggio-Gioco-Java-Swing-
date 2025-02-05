@@ -2,6 +2,7 @@ package oggetti;
 
 import entità.Giocatore;
 import livelli.Livello;
+import main.Gioco;
 import statigioco.Playing;
 import utilità.CaricaSalva;
 
@@ -11,17 +12,19 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import static utilità.Costanti.CostantiOggetto.*;
+import static utilità.MetodiUtili.PuòCannoneVedereGiocatore;
 
 public class GestoreOggetto
 {
-
     private Playing playing;
     private BufferedImage [][] imgsPozione, imgsContenitore;
     private BufferedImage imgSpuntone;
+    private BufferedImage [] imgsCannone;
 
     private ArrayList <Pozione> pozioni;
     private ArrayList <ContenitoreGioco> contenitori;
     private ArrayList <Spuntone> spuntoni;
+    private ArrayList <Cannone> cannoni;
 
     public GestoreOggetto (Playing playing)
     {
@@ -90,7 +93,8 @@ public class GestoreOggetto
     {
         pozioni = new ArrayList <> (nuovoLivello.getPozioni ());
         contenitori = new ArrayList <> (nuovoLivello.getContenitori ());
-        spuntoni = nuovoLivello.getSpuntoni();
+        spuntoni = nuovoLivello.getSpuntoni ();
+        cannoni = nuovoLivello.getCannoni ();
     }
 
     private void caricaImgs ()
@@ -118,9 +122,17 @@ public class GestoreOggetto
         }
 
         imgSpuntone = CaricaSalva.GetAtltanteSprite (CaricaSalva.ATLANTE_TRAPPOLA);
+
+        imgsCannone = new BufferedImage [7];
+        BufferedImage temp = CaricaSalva.GetAtltanteSprite (CaricaSalva.ATLANTE_CANNONE);
+
+        for (int i = 0; i < imgsCannone.length; i ++)
+        {
+            imgsCannone [i] = temp.getSubimage (i * 40, 0, 40, 26);
+        }
     }
 
-    public void update ()
+    public void update (int [][] datiLvl, Giocatore giocatore)
     {
         for (Pozione p : pozioni)
         {
@@ -137,6 +149,61 @@ public class GestoreOggetto
                 contGio.update();
             }
         }
+
+        updateCannoni (datiLvl, giocatore);
+    }
+
+    private boolean isGiocatoreNelRange (Cannone cannone, Giocatore giocatore)
+    {
+        int valoreAssoluto = (int) Math.abs (giocatore.getHitbox().x - cannone.getHitbox().x);
+
+        return valoreAssoluto <= Gioco.DIMENSIONE_CASELLA * 5;
+    }
+
+    private boolean isGiocatoreDifronteCannone (Cannone cannone, Giocatore giocatore)
+    {
+        if (cannone.getTipoOggetto () == CANNONE_SINISTRA)
+        {
+            if (cannone.getHitbox().x > giocatore.getHitbox().x)
+            {
+                return true;
+            }
+        }
+        else if (cannone.getHitbox().x < giocatore.getHitbox().x)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void updateCannoni (int[][] datiLvl, Giocatore giocatore)
+    {
+        for (Cannone cannone : cannoni)
+        {
+            if (!cannone.faiAnimazione)
+            {
+                if (cannone.getCasellaY() == giocatore.getCasellaY())
+                {
+                    if (isGiocatoreNelRange (cannone, giocatore))
+                    {
+                        if (isGiocatoreDifronteCannone (cannone, giocatore))
+                        {
+                            if (PuòCannoneVedereGiocatore (datiLvl, giocatore.getHitbox(), cannone.getHitbox(), cannone.getCasellaY()))
+                            {
+                                sparoCannone (cannone);
+                            }
+                        }
+                    }
+                }
+            }
+
+            cannone.update();
+        }
+    }
+    private void sparoCannone (Cannone cannone)
+    {
+        cannone.setAnimazione (true);
     }
 
     public void draw (Graphics g, int xLvlOffset)
@@ -144,13 +211,36 @@ public class GestoreOggetto
         drawPozioni (g, xLvlOffset);
         drawContenitori (g, xLvlOffset);
         drawTrappole (g, xLvlOffset);
+        drawCannoni (g, xLvlOffset);
     }
 
-    private void drawTrappole(Graphics g, int xLvlOffset)
+    private void drawCannoni (Graphics g, int xLvlOffset)
+    {
+        for (Cannone c : cannoni)
+        {
+            int x = (int) (c.getHitbox().x - xLvlOffset);
+            int larghezza = LARGHEZZA_CANNONE;
+
+            if (c.getTipoOggetto() == CANNONE_DESTRA)
+            {
+                x += larghezza;
+                larghezza *= -1;
+            }
+
+            g.drawImage(imgsCannone[c.getIndiceAni()], x, (int) (c.getHitbox().y), larghezza, ALTEZZA_CANNONE, null);
+        }
+    }
+
+    private void drawTrappole (Graphics g, int xLvlOffset)
     {
         for (Spuntone s : spuntoni)
         {
             g.drawImage (imgSpuntone, (int) (s.getHitbox ().x - xLvlOffset), (int) (s.getHitbox().y - s.getYDrawOffset ()), LARGHEZZA_SPUNTONE, ALTEZZA_SPUNTONE, null);
+        }
+
+        for (Cannone c : cannoni)
+        {
+            c.resetta();
         }
     }
 

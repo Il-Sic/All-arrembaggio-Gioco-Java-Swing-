@@ -5,9 +5,7 @@ import main.Gioco;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
-import static utilità.Costanti.CostantiOggetto.GetSpriteCont;
-import static utilità.Costanti.CostantiOggetto.BARILE;
-import static utilità.Costanti.CostantiOggetto.CASSA;
+import static utilità.Costanti.CostantiOggetto.*;
 import static utilità.Costanti.VEL_ANI;
 
 public class OggettoGioco
@@ -28,22 +26,30 @@ public class OggettoGioco
 
     protected void updateTickAnimazione ()
     {
-        tickAni++;
+        tickAni ++;
+
         if (tickAni >= VEL_ANI)
         {
             tickAni = 0;
-            indiceAni++;
+            indiceAni ++;
+
             if (indiceAni >= GetSpriteCont (tipoOggetto))
             {
                 indiceAni = 0;
+
                 if (tipoOggetto == BARILE || tipoOggetto == CASSA)
                 {
                     faiAnimazione = false;
                     attivo = false;
                 }
+                else if (tipoOggetto == CANNONE_SINISTRA || tipoOggetto == CANNONE_DESTRA)
+                {
+                    faiAnimazione = false;
+                }
             }
         }
     }
+
 
     public void resetta ()
     {
@@ -51,10 +57,14 @@ public class OggettoGioco
         tickAni = 0;
         attivo = true;
 
-        if (tipoOggetto == BARILE || tipoOggetto == CASSA)
+        if (tipoOggetto == BARILE || tipoOggetto == CASSA || tipoOggetto == CANNONE_SINISTRA || tipoOggetto == CANNONE_DESTRA)
+        {
             faiAnimazione = false;
+        }
         else
+        {
             faiAnimazione = true;
+        }
     }
 
     protected void initHitbox (int larghezza, int altezza)

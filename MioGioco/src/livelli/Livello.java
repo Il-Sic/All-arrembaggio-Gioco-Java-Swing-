@@ -2,6 +2,7 @@ package livelli;
 
 import entità.Granchio;
 import main.Gioco;
+import oggetti.Cannone;
 import oggetti.ContenitoreGioco;
 import oggetti.Pozione;
 import oggetti.Spuntone;
@@ -24,6 +25,7 @@ public class Livello
     private ArrayList <Pozione> pozioni;
     private ArrayList <ContenitoreGioco> contenitori;
     private ArrayList <Spuntone> spuntoni;
+    private ArrayList <Cannone> cannoni;
 
 
     private int larghezzaCaselleLvl;
@@ -41,8 +43,14 @@ public class Livello
         creaPozioni ();
         creaContenitori ();
         creaSpuntoni ();
+        creaCannoni ();
         calcolaLvlOffset ();
         calcolaSpawnGiocatore ();
+    }
+
+    private void creaCannoni()
+    {
+        cannoni = MetodiUtili.GetCannoni (img);
     }
 
     private void creaSpuntoni()
@@ -122,5 +130,10 @@ public class Livello
     public ArrayList <Spuntone> getSpuntoni ()
     {
         return spuntoni;
+    }
+
+    public ArrayList <Cannone> getCannoni ()
+    {
+        return cannoni;
     }
 }

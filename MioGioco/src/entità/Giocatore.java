@@ -50,6 +50,8 @@ public class Giocatore extends Entità
     private boolean attaccoControllato;
     private Playing playing;
 
+    private int casellaY = 0;
+
     public Giocatore (float x, float y, int larghezza, int altezza, Playing playing)
     {
         super (x, y, larghezza, altezza);
@@ -87,6 +89,8 @@ public class Giocatore extends Entità
         {
             controllaPozioneToccata ();
             controllaSpuntoniToccati ();
+
+            casellaY = (int) (hitbox.y / Gioco.DIMENSIONE_CASELLA);
         }
 
         if (attacco)
@@ -401,6 +405,11 @@ public class Giocatore extends Entità
     {
         sinistra = false;
         destra = false;
+    }
+
+    public int getCasellaY ()
+    {
+        return casellaY;
     }
 
     public void setAttacco (boolean attacco)

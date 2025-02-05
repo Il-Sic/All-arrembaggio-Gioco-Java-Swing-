@@ -2,6 +2,7 @@ package utilità;
 
 import entità.Granchio;
 import main.Gioco;
+import oggetti.Cannone;
 import oggetti.ContenitoreGioco;
 import oggetti.Pozione;
 import oggetti.Spuntone;
@@ -122,18 +123,16 @@ public class MetodiUtili
         }
     }
 
-    public static boolean isCaselleTutteCalpestabili(int startX, int endX, int y,int[][] datiLvl)
+    public static boolean SonoCaselleTutteCalpestabili (int xInizio, int xFine, int y, int[][] datiLvl)
     {
-        for (int i = 0; i < endX - startX; i ++)
+        if (SonoTutteCasellePulite (xInizio, xFine, y, datiLvl))
         {
-            if (isCasellaSolida (startX + i, y, datiLvl))
+            for (int i = 0; i < xFine - xInizio; i++)
             {
-                return false;
-            }
-
-            if (!isCasellaSolida (startX + i, y  + 1, datiLvl))
-            {
-                return false;
+                if (!isCasellaSolida (xInizio + i, y + 1, datiLvl))
+                {
+                    return false;
+                }
             }
         }
 
@@ -147,11 +146,39 @@ public class MetodiUtili
 
         if (primaCasellaX > secondaCasellaX)
         {
-            return isCaselleTutteCalpestabili (secondaCasellaX, primaCasellaX, casellaY, datiLvl);
+            return SonoCaselleTutteCalpestabili(secondaCasellaX, primaCasellaX, casellaY, datiLvl);
         }
         else
         {
-            return isCaselleTutteCalpestabili (primaCasellaX, secondaCasellaX, casellaY, datiLvl);
+            return SonoCaselleTutteCalpestabili(primaCasellaX, secondaCasellaX, casellaY, datiLvl);
+        }
+    }
+
+    public static boolean SonoTutteCasellePulite (int xStart, int xEnd, int y, int[][] lvlData)
+    {
+        for (int i = 0; i < xEnd - xStart; i++)
+        {
+            if (isCasellaSolida (xStart + i, y, lvlData))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static boolean PuòCannoneVedereGiocatore (int[][] datiLvl, Rectangle2D.Float primaHitbox, Rectangle2D.Float secondaHitbox, int casellaY)
+    {
+        int primaXTile = (int) (primaHitbox.x / Gioco.DIMENSIONE_CASELLA);
+        int secondaXTile = (int) (secondaHitbox.x / Gioco.DIMENSIONE_CASELLA);
+
+        if (primaXTile > secondaXTile)
+        {
+            return MetodiUtili.SonoTutteCasellePulite (secondaXTile, primaXTile, casellaY, datiLvl);
+        }
+        else
+        {
+            return SonoTutteCasellePulite (primaXTile, secondaXTile, casellaY, datiLvl);
         }
     }
 
@@ -275,5 +302,26 @@ public class MetodiUtili
         }
 
         return spuntoni;
+    }
+
+    public static ArrayList <Cannone> GetCannoni (BufferedImage img)
+    {
+        ArrayList <Cannone> cannoni = new ArrayList<>();
+
+        for (int j = 0; j < img.getHeight(); j++)
+        {
+            for (int i = 0; i < img.getWidth(); i++)
+            {
+                Color color = new Color(img.getRGB(i, j));
+                int valore = color.getBlue();
+
+                if (valore == CANNONE_SINISTRA || valore == CANNONE_DESTRA)
+                {
+                    cannoni.add(new Cannone(i * Gioco.DIMENSIONE_CASELLA, j * Gioco.DIMENSIONE_CASELLA, valore));
+                }
+            }
+        }
+
+        return cannoni;
     }
 }

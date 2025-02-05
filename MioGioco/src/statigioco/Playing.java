@@ -130,7 +130,7 @@ public class Playing extends Stato implements StatoMetodi
         else if (!gameOver)
         {
             gestioneLivello.update ();
-            gestoreOggetto.update ();
+            gestoreOggetto.update (gestioneLivello.getLivelloCorrente ().getDatiLvl(), giocatore);
             giocatore.update ();
             gestioneNemico.update (gestioneLivello.getLivelloCorrente().getDatiLvl(), giocatore);
             controllaVicinoBordo ();

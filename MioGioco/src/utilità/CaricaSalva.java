@@ -30,6 +30,7 @@ public class CaricaSalva
     public static final String ATLANTE_POZIONE = "potions_sprites.png";
     public static final String ATLANTE_CONTENITORE = "objects_sprites.png";
     public static final String ATLANTE_TRAPPOLA = "trap_atlas.png";
+    public static final String ATLANTE_CANNONE = "cannon_atlas.png";
 
     public static BufferedImage GetAtltanteSprite (String nomeFile)                        // restituisce un immagine memorizzata nel buffer
     {
