@@ -2,6 +2,8 @@ package utilità;
 
 import entità.Granchio;
 import main.Gioco;
+import oggetti.ContenitoreGioco;
+import oggetti.Pozione;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -9,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import static utilità.Costanti.CostantiNemico.GRANCHIO;
+import static utilità.Costanti.CostantiOggetto.*;
 
 public class MetodiUtili
 {
@@ -209,5 +212,45 @@ public class MetodiUtili
         }
 
         return new Point (1 * Gioco.DIMENSIONE_CASELLA, 1 * Gioco.DIMENSIONE_CASELLA);
+    }
+
+    public static ArrayList <Pozione> GetPozioni (BufferedImage img)
+    {
+        ArrayList <Pozione> pozioni = new ArrayList<>();
+
+        for (int j = 0; j < img.getHeight(); j++)
+        {
+            for (int i = 0; i < img.getWidth(); i++)
+            {
+                Color color = new Color(img.getRGB(i, j));
+                int valore = color.getBlue();
+
+                if (valore == POZIONE_ROSSA || valore == POZIONE_BLU)
+                {
+                    pozioni.add(new Pozione (i * Gioco.DIMENSIONE_CASELLA, j * Gioco.DIMENSIONE_CASELLA, valore));
+                }
+            }
+        }
+
+        return pozioni;
+    }
+    public static ArrayList <ContenitoreGioco> GetContenitori (BufferedImage img)
+    {
+        ArrayList <ContenitoreGioco> contenitori = new ArrayList<>();
+
+        for (int j = 0; j < img.getHeight(); j++)
+        {
+            for (int i = 0; i < img.getWidth(); i++)
+            {
+                Color color = new Color(img.getRGB(i, j));
+                int valore = color.getBlue();
+
+                if (valore == CASSA || valore == BARILE)
+                {
+                    contenitori.add(new ContenitoreGioco(i * Gioco.DIMENSIONE_CASELLA, j * Gioco.DIMENSIONE_CASELLA, valore));
+                }
+            }
+        }
+        return contenitori;
     }
 }

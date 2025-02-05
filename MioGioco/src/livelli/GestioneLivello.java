@@ -40,6 +40,7 @@ public class GestioneLivello
         gioco.getPlaying ().getGestioneNemico ().caricaNemici (nuovoLivello);
         gioco.getPlaying ().getGiocatore ().caricaDatiLvl (nuovoLivello.getDatiLvl ());
         gioco.getPlaying ().setMaxLvlOffset (nuovoLivello.getLvlOffset ());
+        gioco.getPlaying ().getGestoreOggetto ().caricaOggetti (nuovoLivello);
     }
 
     private void costruisciTuttiLivelli() throws URISyntaxException, IOException

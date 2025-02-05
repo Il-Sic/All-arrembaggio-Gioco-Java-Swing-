@@ -6,6 +6,9 @@ import static utilità.Costanti.CostantiNemico.GRANCHIO;
 
 public class Costanti
 {
+    public static final float GRAVIOL = 0.04f * Gioco.SCALA;
+    public static final int VEL_ANI = 25;
+
     public static class CostantiNemico
     {
         public static final int GRANCHIO = 0;
@@ -164,6 +167,34 @@ public class Costanti
                 case SALTO, ATTACCO -> 3;
                 case CADUTA -> 1;
                 default -> 1;                   // e anche CADUTA
+            };
+        }
+    }
+
+    public static class CostantiOggetto
+    {
+        public static final int POZIONE_ROSSA = 0;
+        public static final int POZIONE_BLU = 1;
+        public static final int BARILE = 2;
+        public static final int CASSA = 3;
+        public static final int VALORE_POZIONE_ROSSA = 15;
+        public static final int VALORE_POZIONE_BLU = 10;
+        public static final int LARGHEZZA_CONTENITORE_DEFAULT = 40;
+        public static final int ALTEZZA_CONTENITORE_DEFAULT = 30;
+        public static final int LARGHEZZA_CONTENITORE = (int) (Gioco.SCALA * LARGHEZZA_CONTENITORE_DEFAULT);
+        public static final int ALTEZZA_CONTENITORE = (int) (Gioco.SCALA * ALTEZZA_CONTENITORE_DEFAULT);
+        public static final int LARGHEZZA_POZIONE_DEFAULT = 12;
+        public static final int ALTEZZA_POZIONE_DEFAULT = 16;
+        public static final int LARGHEZZA_POZIONE = (int) (Gioco.SCALA * LARGHEZZA_POZIONE_DEFAULT);
+        public static final int ALTEZZA_POZIONE = (int) (Gioco.SCALA * ALTEZZA_POZIONE_DEFAULT);
+
+        public static int GetSpriteCont (int tipoOggetto)
+        {
+            return switch (tipoOggetto)
+            {
+                case POZIONE_ROSSA, POZIONE_BLU -> 7;
+                case BARILE, CASSA -> 8;
+                default -> 1;
             };
         }
     }

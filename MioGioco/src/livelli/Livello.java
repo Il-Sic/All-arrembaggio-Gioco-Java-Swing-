@@ -2,6 +2,9 @@ package livelli;
 
 import entità.Granchio;
 import main.Gioco;
+import oggetti.ContenitoreGioco;
+import oggetti.Pozione;
+import utilità.MetodiUtili;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -17,6 +20,9 @@ public class Livello
     private int [][] datiLvl;
     private ArrayList <Granchio> granchi;
 
+    private ArrayList <Pozione> pozioni;
+    private ArrayList <ContenitoreGioco> contenitori;
+
     private int larghezzaCaselleLvl;
     private int maxCaselleOffset ;
     private int maxXLvlOffset;
@@ -29,8 +35,20 @@ public class Livello
 
         creaDatiLivello ();
         creaNemici ();
+        creaPozioni ();
+        creaContenitori ();
         calcolaLvlOffset ();
         calcolaSpawnGiocatore ();
+    }
+
+    private void creaContenitori()
+    {
+        contenitori = MetodiUtili.GetContenitori (img);
+    }
+
+    private void creaPozioni()
+    {
+        pozioni = MetodiUtili.GetPozioni (img);
     }
 
     private void creaDatiLivello()
@@ -80,5 +98,15 @@ public class Livello
     public Point getSpawnGiocatore ()
     {
         return spawnGiocatore;
+    }
+
+    public ArrayList <Pozione> getPozioni ()
+    {
+        return pozioni;
+    }
+
+    public ArrayList <ContenitoreGioco> getContenitori ()
+    {
+        return contenitori;
     }
 }

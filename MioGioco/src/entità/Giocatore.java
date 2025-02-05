@@ -9,23 +9,22 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 import static utilità.Costanti.CostantiGiocatore.*;
+import static utilità.Costanti.GRAVIOL;
+import static utilità.Costanti.VEL_ANI;
 import static utilità.MetodiUtili.*;
 
 public class Giocatore extends Entità
 {
     private BufferedImage[][] animazioni;                                       // non le carico perchè le utlizzo solo temporaneamente
-    private int tickAni, indiceAni, velAni = 25;                                // 30 perchè le animazioni sono a 120 fps / 4 immagini = 30 ma va troppo lento quindi ho incrementato a 50
-    private int azioneGiocatore = IDLE;                                         // importato da utils
     private boolean movimento = false, attacco = false;
-    private boolean sopra, sinistra, sotto, destra, salto;
-    private float velGiocatore = 1.0f * Gioco.SCALA;
+    private boolean sinistra, destra, salto;
     private int [][] datiLvl;
     private float xDrawOffset = 21 * Gioco.SCALA;
     private float yDrawOffset = 4 * Gioco.SCALA;
 
     // SALTO e GRAVITÀ
-    private float velAria = 0f;
-    private float gravità = 0.04f * Gioco.SCALA;
+//    private float velAria = 0f;
+//    private float gravità = 0.04f * Gioco.SCALA;
     private float velSalto = -2.25f * Gioco.SCALA;                              // negativo perchè si sposta sulle y e quindi in altezza
     private float velCadutaDopoCollisione =  0.5f * Gioco.SCALA;                // quando ad esempio si colpisce il tetto
     private boolean inAria = false;
@@ -43,12 +42,8 @@ public class Giocatore extends Entità
     private int xInizioBarraVita = (int) (34 * Gioco.SCALA);
     private int yInizioBarraVita = (int) (14 * Gioco.SCALA);
 
-    private int vitaMax = 100;
-    private int vitaCorrente = vitaMax;
     private int larghezzaVita = larghezzaBarraVita;
 
-    // Box attacco
-    private Rectangle2D.Float attackBox;
     private int xFlip = 0;
     private int lFlip = 1;
 
@@ -59,8 +54,13 @@ public class Giocatore extends Entità
     {
         super (x, y, larghezza, altezza);
         this.playing = playing;
+        this.stato = IDLE;
+        this.vitaMax = 100;
+        this.vitaCorrente = vitaMax;
+        this.vitaCorrente = 35;
+        this.velPg = 1.0f * Gioco.SCALA;
         caricaAnimazioni ();
-        initHitBox (x, y, (int) (20 * Gioco.SCALA), (int) (27 * Gioco.SCALA));
+        initHitBox (20, 27);
         initAttackBox ();
     }
 
@@ -83,6 +83,11 @@ public class Giocatore extends Entità
 
         updatePos ();
 
+        if (movimento)
+        {
+            controllaPozioneToccata ();
+        }
+
         if (attacco)
         {
             controllaAttacco ();
@@ -90,6 +95,11 @@ public class Giocatore extends Entità
 
         updateTickAnimazioni ();
         setAnimazione ();
+    }
+
+    private void controllaPozioneToccata()
+    {
+        playing.controllaPozioneToccata (hitbox);
     }
 
     private void controllaAttacco()
@@ -102,9 +112,10 @@ public class Giocatore extends Entità
         attaccoControllato = true;
 
         playing.controllaColpoNemico (attackBox);
+        playing.controllaHitOggetto (attackBox);
     }
 
-    private void updateAttackBox()
+    private void updateAttackBox ()
     {
         if (destra)
         {
@@ -130,8 +141,6 @@ public class Giocatore extends Entità
         if (vitaCorrente <= 0)
         {
             vitaCorrente = 0;
-
-            //gameOver ();
         }
         else if (vitaCorrente >= vitaMax)
         {
@@ -139,20 +148,19 @@ public class Giocatore extends Entità
         }
     }
 
+    public void cambiaForza (int valore)
+    {
+        System.out.println ("Forza migliorata");
+    }
+
     public void render (Graphics g, int lvlOffset)
     {
-        g.drawImage (animazioni [azioneGiocatore][indiceAni], (int) (hitbox.x - xDrawOffset) - lvlOffset + xFlip,  (int) (hitbox.y - yDrawOffset) , larghezza * lFlip, altezza, null);              // qui modifico l' immagine e la sua dimensione
+        g.drawImage (animazioni [stato][indiceAni], (int) (hitbox.x - xDrawOffset) - lvlOffset + xFlip,  (int) (hitbox.y - yDrawOffset) , larghezza * lFlip, altezza, null);              // qui modifico l' immagine e la sua dimensione
 //        drawHitBox (g, lvlOffset);
 
 //        drawAttackBox (g, lvlOffset);
 
         drawUI (g);
-    }
-
-    private void drawAttackBox(Graphics g, int xLvlOffset)
-    {
-        g.setColor (Color.red);
-        g.drawRect ((int) attackBox.x - xLvlOffset, (int) attackBox.y, (int) attackBox.width, (int) attackBox.height);
     }
 
     private void drawUI (Graphics g)
@@ -172,12 +180,12 @@ public class Giocatore extends Entità
     {
         tickAni ++;
 
-        if (tickAni >= velAni)                      // quando è uguale o supera cambia immagine simulando un animazione
+        if (tickAni >= VEL_ANI)                      // quando è uguale o supera cambia immagine simulando un animazione
         {
             tickAni = 0;
             indiceAni ++;
 
-            if (indiceAni >= GetSpriteCont (azioneGiocatore))
+            if (indiceAni >= GetSpriteCont (stato))
             {
                 indiceAni = 0;
                 attacco = false;
@@ -188,32 +196,32 @@ public class Giocatore extends Entità
 
     private void setAnimazione()
     {
-        int iniziaAni = azioneGiocatore;
+        int iniziaAni = stato;
 
         if (movimento)
         {
-            azioneGiocatore = CORSA;
+            stato = CORSA;
         }
         else
         {
-            azioneGiocatore = IDLE;
+            stato = IDLE;
         }
 
         if (inAria)
         {
             if (velAria < 0)
             {
-                azioneGiocatore = SALTO;
+                stato = SALTO;
             }
             else
             {
-                azioneGiocatore = CADUTA;
+                stato = CADUTA;
             }
         }
 
         if (attacco)
         {
-            azioneGiocatore = ATTACCO;
+            stato = ATTACCO;
 
             if (iniziaAni != ATTACCO)
             {
@@ -223,7 +231,7 @@ public class Giocatore extends Entità
             }
         }
 
-        if (iniziaAni != azioneGiocatore)
+        if (iniziaAni != stato)
         {
             resetTickAni ();
         }
@@ -266,7 +274,7 @@ public class Giocatore extends Entità
 
         if (sinistra)
         {
-            velX -= velGiocatore;
+            velX -= velPg;
 
             xFlip = larghezza;
             lFlip = -1;
@@ -274,7 +282,7 @@ public class Giocatore extends Entità
 
         if (destra)
         {
-            velX += velGiocatore;
+            velX += velPg;
 
             xFlip = 0;
             lFlip = 1;
@@ -293,7 +301,7 @@ public class Giocatore extends Entità
             if (puòMuoversiQui(hitbox.x, hitbox.y + velAria, hitbox.width, hitbox.height, datiLvl))
             {
                 hitbox.y += velAria;
-                velAria += gravità;
+                velAria += GRAVIOL;
                 updatePosX(velX);
             }
             else
@@ -380,25 +388,13 @@ public class Giocatore extends Entità
 
     public void resetDirBooleans ()
     {
-        sopra = false;
         sinistra = false;
-        sotto = false;
         destra = false;
     }
 
     public void setAttacco (boolean attacco)
     {
         this.attacco = attacco;
-    }
-
-    public boolean isSopra ()
-    {
-        return sopra;
-    }
-
-    public void setSopra (boolean sopra)
-    {
-        this.sopra = sopra;
     }
 
     public boolean isSinistra ()
@@ -409,16 +405,6 @@ public class Giocatore extends Entità
     public void setSinistra (boolean sinistra)
     {
         this.sinistra = sinistra;
-    }
-
-    public boolean isSotto ()
-    {
-        return sotto;
-    }
-
-    public void setSotto (boolean sotto)
-    {
-        this.sotto = sotto;
     }
 
     public boolean isDestra ()
@@ -443,7 +429,7 @@ public class Giocatore extends Entità
         inAria = false;
         attacco = false;
         movimento = false;
-        azioneGiocatore = IDLE;
+        stato = IDLE;
         vitaCorrente = vitaMax;
         hitbox.x = x;
         hitbox.y = y;

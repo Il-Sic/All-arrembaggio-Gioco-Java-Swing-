@@ -10,14 +10,12 @@ import static utilità.Costanti.Direzioni.DESTRA;
 
 public class Granchio extends Nemico
 {
-    // Box attacco
-    private Rectangle2D.Float attackBox;
     private int xAttackBoxOffset;
 
     public Granchio (float x, float y)
     {
         super (x, y, LARGHEZZA_GRANCHIO, ALTEZZA_GRANCHIO, GRANCHIO);
-        initHitBox (x, y, (int) (22 * Gioco.SCALA), (int) (19  * Gioco.SCALA));
+        initHitBox (22 , 19);
         initAttackBox ();
     }
 
@@ -53,7 +51,7 @@ public class Granchio extends Nemico
         }
         else
         {
-            switch (statoNemico)
+            switch (stato)
             {
                 case IDLE -> nuovoStato (CORSA);
 
@@ -86,12 +84,6 @@ public class Granchio extends Nemico
                 }
             }
         }
-    }
-
-    public void drawAttackBox (Graphics g, int xLvlOffset)
-    {
-        g.setColor (Color.red);
-        g.drawRect ((int) (attackBox.x - xLvlOffset), (int) (attackBox.y), (int) (attackBox.width), (int) (attackBox.height));
     }
 
     public int xFlip ()

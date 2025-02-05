@@ -4,6 +4,7 @@ import entità.GestioneNemico;
 import entità.Giocatore;
 import livelli.GestioneLivello;
 import main.Gioco;
+import oggetti.GestoreOggetto;
 import ui.OverlayGameOver;
 import ui.OverlayLivelloCompletato;
 import ui.OverlayPausa;
@@ -25,6 +26,7 @@ public class Playing extends Stato implements StatoMetodi
     private Giocatore giocatore;
     private GestioneNemico gestioneNemico;
     private GestioneLivello gestioneLivello;
+    private GestoreOggetto gestoreOggetto;
     private OverlayPausa overlayPausa;
     private OverlayGameOver overlayGameOver;
     private OverlayLivelloCompletato overlayLivelloCompletato;
@@ -75,6 +77,7 @@ public class Playing extends Stato implements StatoMetodi
     private void caricaInizioLivello()
     {
         gestioneNemico.caricaNemici (gestioneLivello.getLivelloCorrente ());
+        gestoreOggetto.caricaOggetti (gestioneLivello.getLivelloCorrente ());
     }
 
     private void calcolaLvlOffset()
@@ -94,6 +97,8 @@ public class Playing extends Stato implements StatoMetodi
         overlayPausa = new OverlayPausa (this);
         overlayGameOver = new OverlayGameOver (this);
         overlayLivelloCompletato = new OverlayLivelloCompletato (this);
+
+        gestoreOggetto = new GestoreOggetto (this);
     }
 
     public void windowFocusLost ()
@@ -125,6 +130,7 @@ public class Playing extends Stato implements StatoMetodi
         else if (!gameOver)
         {
             gestioneLivello.update ();
+            gestoreOggetto.update ();
             giocatore.update ();
             gestioneNemico.update (gestioneLivello.getLivelloCorrente().getDatiLvl(), giocatore);
             controllaVicinoBordo ();
@@ -178,6 +184,7 @@ public class Playing extends Stato implements StatoMetodi
         gestioneLivello.draw(g, xLvlOffset);
         giocatore.render(g, xLvlOffset);
         gestioneNemico.draw(g, xLvlOffset);
+        gestoreOggetto.draw(g, xLvlOffset);
 
         if (inPausa)
         {
@@ -274,19 +281,9 @@ public class Playing extends Stato implements StatoMetodi
         {
             switch (e.getKeyCode())
             {
-                case KeyEvent.VK_W ->
-                {
-                    giocatore.setSopra (true);
-                }
-
                 case KeyEvent.VK_A ->
                 {
                     giocatore.setSinistra (true);
-                }
-
-                case KeyEvent.VK_S ->
-                {
-                    giocatore.setSotto (true);
                 }
 
                 case KeyEvent.VK_D ->
@@ -351,11 +348,22 @@ public class Playing extends Stato implements StatoMetodi
         lvlCompletato = false;
         giocatore.resettaTutto ();
         gestioneNemico.resettaTuttoNemici ();
+        gestoreOggetto.resettaTuttiOggetti();
     }
 
     public void controllaColpoNemico (Rectangle2D.Float attackBox)
     {
         gestioneNemico.controllaColpoNemico (attackBox);
+    }
+
+    public void controllaHitOggetto (Rectangle2D.Float attackbox)
+    {
+        gestoreOggetto.controllaHitOggetto (attackbox);
+    }
+
+    public void controllaPozioneToccata (Rectangle2D.Float hitbox)
+    {
+        gestoreOggetto.controllaOggettoToccato (hitbox);
     }
 
     public void setGameOver (boolean gameOver)
@@ -366,6 +374,11 @@ public class Playing extends Stato implements StatoMetodi
     public GestioneNemico getGestioneNemico ()
     {
         return gestioneNemico;
+    }
+
+    public GestoreOggetto getGestoreOggetto ()
+    {
+        return gestoreOggetto;
     }
 
     public void setMaxLvlOffset (int lvlOffset)

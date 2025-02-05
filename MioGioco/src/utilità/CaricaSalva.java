@@ -27,6 +27,8 @@ public class CaricaSalva
     public static final String GRANDI_NUVOLE = "grandi_nuvole.png";
     public static final String BARRA_STATO = "health_power_bar.png";
     public static final String LIVELLO_COMPLETATO = "completed_sprite.png";
+    public static final String ATLANTE_POZIONE = "potions_sprites.png";
+    public static final String ATLANTE_CONTENITORE = "objects_sprites.png";
 
     public static BufferedImage GetAtltanteSprite (String nomeFile)                        // restituisce un immagine memorizzata nel buffer
     {

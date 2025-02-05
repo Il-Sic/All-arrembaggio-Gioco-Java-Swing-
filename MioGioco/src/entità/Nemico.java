@@ -4,59 +4,50 @@ import main.Gioco;
 
 import java.awt.geom.Rectangle2D;
 
+import static utilità.Costanti.*;
 import static utilità.Costanti.CostantiNemico.*;
 import static utilità.Costanti.Direzioni.*;
-import static utilità.Costanti.GetDannoNemico;
-import static utilità.Costanti.GetVitaMax;
 import static utilità.MetodiUtili.*;
 
 public class Nemico extends Entità
 {
-    protected int indiceAni, statoNemico, tipoNemico;
-    protected int tickAni, velAni = 25;
+    protected int tipoNemico;
     protected boolean primoUpdate = true;
-    protected boolean inAria;
-    protected float gravità = 0.04f * Gioco.SCALA;
-    protected float velCaduta;
-    protected float velCamminata = 0.3f * Gioco.SCALA;
     protected int dirCamminata = SINISTRA;
     protected int casellaY;
     protected float distanzaAttacco = Gioco.DIMENSIONE_CASELLA;
-    protected int vitaMax;
-    protected int vitaCorrente;
     protected boolean attivo = true;
     protected boolean attaccoControllato;
 
 
-    public Nemico(float x, float y, int larghezza, int altezza, int tipoNemico)
+    public Nemico (float x, float y, int larghezza, int altezza, int tipoNemico)
     {
-        super(x, y, larghezza, altezza);
+        super (x, y, larghezza, altezza);
         this.tipoNemico = tipoNemico;
-
-        initHitBox(x, y, larghezza, altezza);
 
         vitaMax = GetVitaMax (tipoNemico);
         vitaCorrente = vitaMax;
+        this.velPg = 0.5f * Gioco.SCALA;
     }
 
     protected void updateTickAnimazione()
     {
         tickAni++;
 
-        if (tickAni >= velAni)
+        if (tickAni >= VEL_ANI)
         {
             tickAni = 0;
             indiceAni ++;
 
-            if (indiceAni >= GetContSprite(tipoNemico, statoNemico))
+            if (indiceAni >= GetContSprite(tipoNemico, stato))
             {
                 indiceAni = 0;
 
-                switch (statoNemico)
+                switch (stato)
                 {
                     case ATTACCO, COLPO ->
                     {
-                        statoNemico = IDLE;
+                        stato = IDLE;
                     }
                     case MORTE ->
                     {
@@ -92,15 +83,15 @@ public class Nemico extends Entità
 
     protected void updateInAria(int[][] datiLvl)
     {
-        if (puòMuoversiQui(hitbox.x, hitbox.y + velCaduta, hitbox.width, hitbox.height, datiLvl))
+        if (puòMuoversiQui(hitbox.x, hitbox.y + velAria, hitbox.width, hitbox.height, datiLvl))
         {
-            hitbox.y += velCaduta;
-            velCaduta += gravità;
+            hitbox.y += velAria;
+            velAria += GRAVIOL;
         }
         else
         {
             inAria = false;
-            hitbox.y = getPosizioneEntitàVicinoAlMuroY(hitbox, velCaduta);
+            hitbox.y = getPosizioneEntitàVicinoAlMuroY(hitbox, velAria);
             casellaY = (int) (hitbox.y / Gioco.DIMENSIONE_CASELLA);
         }
     }
@@ -111,11 +102,11 @@ public class Nemico extends Entità
 
         if (dirCamminata == SINISTRA)
         {
-            velX = - velCamminata;
+            velX = - velPg;
         }
         else
         {
-            velX = velCamminata;
+            velX = velPg;
         }
 
         if (puòMuoversiQui(hitbox.x + velX, hitbox.y, hitbox.width, hitbox.height, datiLvl))
@@ -145,7 +136,7 @@ public class Nemico extends Entità
 
     protected void nuovoStato (int statoNemico)
     {
-        this.statoNemico = statoNemico;
+        this.stato = statoNemico;
 
         tickAni = 0;
         indiceAni = 0;
@@ -216,14 +207,9 @@ public class Nemico extends Entità
         return valoreAssoluto <= distanzaAttacco;
     }
 
-    public int getIndiceAni()
-    {
-        return indiceAni;
-    }
-
     public int getStatoNemico()
     {
-        return statoNemico;
+        return stato;
     }
 
     public boolean isAttivo ()
@@ -239,6 +225,6 @@ public class Nemico extends Entità
         vitaCorrente = vitaMax;
         nuovoStato (IDLE);
         attivo = true;
-        velCaduta = 0;
+        velAria = 0;
     }
 }
