@@ -14,6 +14,7 @@ public class TastoVolume extends PauseButton
     private int indice = 0;
     private boolean mouseOver, mousePressed;
     private int buttonX, minX, maxX;
+    private float valoreFloat = 0f;
 
     public TastoVolume(int x, int y, int larghezza, int altezza)
     {
@@ -76,7 +77,15 @@ public class TastoVolume extends PauseButton
             buttonX = x;
         }
 
-        limiti.x = buttonX;
+        updateValoreFloat();
+        limiti.x = buttonX - LARGHEZZA_VOLUME / 2;
+    }
+
+    private void updateValoreFloat()
+    {
+        float range = maxX - minX;
+        float valore = buttonX - minX;
+        valoreFloat = valore / range;
     }
 
     public void resetBools ()
@@ -103,5 +112,10 @@ public class TastoVolume extends PauseButton
     public void setMousePressed (boolean mousePressed)
     {
         this.mousePressed = mousePressed;
+    }
+
+    public float getValoreFloat ()
+    {
+        return valoreFloat;
     }
 }

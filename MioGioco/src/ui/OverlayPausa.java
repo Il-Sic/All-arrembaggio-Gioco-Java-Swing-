@@ -113,8 +113,8 @@ public class OverlayPausa
         {
             if (menuB.isMousePressed ())
             {
-                StatoGioco.stato = StatoGioco.MENU;
-                playing.riprendiGioco ();
+                playing.setStato (StatoGioco.MENU);
+                playing.riprendiGioco();
             }
         }
         else if (isDentro (e, rigiocaB))

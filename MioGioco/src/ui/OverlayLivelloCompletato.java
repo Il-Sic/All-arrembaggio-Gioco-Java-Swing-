@@ -83,18 +83,20 @@ public class OverlayLivelloCompletato
 
     public void mouseReleased (MouseEvent e)
     {
-        if (isDentro (successivo, e))
-        {
-            if (successivo.isMousePressed())
-            {
-                playing.caricaLivelloSuccessivo ();
-            }
-        }
-        else if (isDentro (menu, e))
+        if (isDentro (menu, e))
         {
             if (menu.isMousePressed())
             {
-                StatoGioco.stato = StatoGioco.MENU;
+                playing.resettaTutto ();
+                playing.setStato (StatoGioco.MENU);
+            }
+        }
+        else if (isDentro (successivo, e))
+        {
+            if (successivo.isMousePressed())
+            {
+                playing.caricaLivelloSuccessivo();
+                playing.getGioco().getLettoreAudio().setCanzoneLivello (playing.getGestioneLivello().getIndiceLivello());
             }
         }
 

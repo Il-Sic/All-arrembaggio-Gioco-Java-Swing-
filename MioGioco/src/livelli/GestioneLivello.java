@@ -92,4 +92,9 @@ public class GestioneLivello
     {
         return livelli.size ();
     }
+
+    public int getIndiceLivello ()
+    {
+        return indiceLvl;
+    }
 }

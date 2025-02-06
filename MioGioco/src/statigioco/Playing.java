@@ -417,6 +417,11 @@ public class Playing extends Stato implements StatoMetodi
     public void setLivelloCompletato (boolean livelloCompletato)
     {
         this.lvlCompletato = livelloCompletato;
+
+        if (livelloCompletato)
+        {
+            gioco.getLettoreAudio().livelloCompletato();
+        }
     }
 
     public void setMorteGiocatore (boolean morteGiocatore)

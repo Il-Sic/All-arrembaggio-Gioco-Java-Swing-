@@ -1,5 +1,6 @@
 package main;
 
+import audio.LettoreAudio;
 import statigioco.Menu;
 import statigioco.OpzioniGioco;
 import statigioco.Playing;
@@ -23,6 +24,7 @@ public class Gioco implements Runnable
     private Menu menu;
     private OpzioniGioco opzioniGioco;
     private OpzioniAudio opzioniAudio;
+    private LettoreAudio lettoreAudio;
 
     public static final int DIMENSIONE_PREDEFINITA_CASELLA = 32;
     public static final float SCALA = 2f;
@@ -46,7 +48,8 @@ public class Gioco implements Runnable
 
     private void initClassi () throws URISyntaxException, IOException
     {
-        opzioniAudio = new OpzioniAudio();
+        opzioniAudio = new OpzioniAudio(this);
+        lettoreAudio = new LettoreAudio();
         menu = new Menu (this);
         playing = new Playing (this);
         opzioniGioco = new OpzioniGioco (this);
@@ -192,5 +195,10 @@ public class Gioco implements Runnable
     public OpzioniGioco getOpzioniGioco ()
     {
         return opzioniGioco;
+    }
+
+    public LettoreAudio getLettoreAudio ()
+    {
+        return lettoreAudio;
     }
 }

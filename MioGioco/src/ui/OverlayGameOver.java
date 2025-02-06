@@ -22,6 +22,7 @@ public class OverlayGameOver
     public OverlayGameOver (Playing playing)
     {
         this.playing = playing;
+
         creaImg();
         creaButtons();
     }
@@ -45,7 +46,7 @@ public class OverlayGameOver
         imgY = (int) (100 * Gioco.SCALA);
     }
 
-    public void draw(Graphics g)
+    public void draw (Graphics g)
     {
         g.setColor (new Color (0, 0, 0, 200));
         g.fillRect (0, 0, Gioco.ALTEZZA_GIOCO, Gioco.ALTEZZA_GIOCO);
@@ -64,11 +65,7 @@ public class OverlayGameOver
 
     public void keyPressed (KeyEvent e)
     {
-        if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
-        {
-            playing.resettaTutto();
-            StatoGioco.stato = StatoGioco.MENU;
-        }
+
     }
 
     private boolean isDentro (UrmButton b, MouseEvent e)
@@ -107,6 +104,7 @@ public class OverlayGameOver
             if (gioca.isMousePressed ())
             {
                 playing.resettaTutto ();
+                playing.getGioco().getLettoreAudio().setCanzoneLivello(playing.getGestioneLivello().getIndiceLivello());
             }
         }
 

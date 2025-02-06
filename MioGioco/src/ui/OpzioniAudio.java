@@ -13,8 +13,12 @@ public class OpzioniAudio
 {
     private TastoVolume tastoVolume;
     private TastoSuono tastoMusica, tastoSfx;
-    public OpzioniAudio ()
+    private Gioco gioco;
+
+    public OpzioniAudio (Gioco gioco)
     {
+        this.gioco = gioco;
+
         creaTastoSuono();
         creaTastoVolume();
     }
@@ -48,7 +52,15 @@ public class OpzioniAudio
     {
         if (tastoVolume.isMousePressed())
         {
-            tastoVolume.cambiaX (e.getX());
+            float valorePrecedente = tastoVolume.getValoreFloat();
+            tastoVolume.cambiaX(e.getX());
+
+            float valoreSuccessivo = tastoVolume.getValoreFloat();
+
+            if (valorePrecedente != valoreSuccessivo)
+            {
+                gioco.getLettoreAudio ().setVolume (valoreSuccessivo);
+            }
         }
     }
     public void mousePressed (MouseEvent e)
@@ -73,6 +85,7 @@ public class OpzioniAudio
             if (tastoMusica.isMousePressed())
             {
                 tastoMusica.setMuted (!tastoMusica.isMuted());
+                gioco.getLettoreAudio ().toggleMutaCanzone ();
             }
         }
         else if (isDentro (e, tastoSfx))
@@ -80,6 +93,7 @@ public class OpzioniAudio
             if (tastoSfx.isMousePressed())
             {
                 tastoSfx.setMuted (!tastoSfx.isMuted());
+                gioco.getLettoreAudio().toggleMutaEffetto();
             }
         }
 

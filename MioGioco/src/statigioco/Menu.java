@@ -94,6 +94,11 @@ public class Menu extends Stato implements StatoMetodi
                     mb.applicaStatoGioco ();
                 }
 
+                if (mb.getStato() == StatoGioco.PLAYING)
+                {
+                    gioco.getLettoreAudio().setCanzoneLivello(gioco.getPlaying().getGestioneLivello().getIndiceLivello());
+                }
+
                 break;
             }
         }
@@ -130,10 +135,7 @@ public class Menu extends Stato implements StatoMetodi
     @Override
     public void keyPressed (KeyEvent e)
     {
-        if (e.getKeyCode () == KeyEvent.VK_ENTER)
-        {
-            StatoGioco.stato = StatoGioco.PLAYING;
-        }
+
     }
 
     @Override

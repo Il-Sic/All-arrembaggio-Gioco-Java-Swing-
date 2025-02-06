@@ -1,5 +1,6 @@
 package entità;
 
+import audio.LettoreAudio;
 import main.Gioco;
 import statigioco.Playing;
 import utilità.CaricaSalva;
@@ -61,6 +62,7 @@ public class Giocatore extends Entità
         this.vitaCorrente = vitaMax;
         this.vitaCorrente = 35;
         this.velPg = 1.0f * Gioco.SCALA;
+
         caricaAnimazioni ();
         initHitBox (20, 27);
         initAttackBox ();
@@ -83,10 +85,13 @@ public class Giocatore extends Entità
                 tickAni = 0;
                 indiceAni = 0;
                 playing.setMorteGiocatore (true);
+                playing.getGioco().getLettoreAudio().riproduciEffetto(LettoreAudio.MUORI);
             }
             else if (indiceAni == GetSpriteCont (MORTE) - 1 && tickAni >= VEL_ANI - 1)
             {
                 playing.setGameOver(true);
+                playing.getGioco().getLettoreAudio().fermaCanzone();
+                playing.getGioco().getLettoreAudio().riproduciEffetto(LettoreAudio.GAMEOVER);
             }
             else
             {
@@ -143,6 +148,7 @@ public class Giocatore extends Entità
 
         playing.controllaColpoNemico (attackBox);
         playing.controllaHitOggetto (attackBox);
+        playing.getGioco().getLettoreAudio().riproduciSuonoAttacco();
     }
 
     private void updateAttackBox ()
@@ -365,9 +371,9 @@ public class Giocatore extends Entità
             return;
         }
 
+        playing.getGioco().getLettoreAudio().riproduciEffetto(LettoreAudio.SALTO);
         inAria = true;
         velAria = velSalto;
-
     }
 
     private void resetInAria ()

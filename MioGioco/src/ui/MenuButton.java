@@ -100,4 +100,9 @@ public class MenuButton
         mouseOver = false;
         mousePressed = false;
     }
+
+    public StatoGioco getStato ()
+    {
+        return stato;
+    }
 }
