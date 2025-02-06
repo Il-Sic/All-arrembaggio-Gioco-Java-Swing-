@@ -4,41 +4,29 @@ import main.Gioco;
 import statigioco.Playing;
 import statigioco.StatoGioco;
 import utilità.CaricaSalva;
-import utilità.Costanti;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
-import static utilità.Costanti.UI.PauseButtons.*;
 import static utilità.Costanti.UI.UrmButtons.*;
-import static utilità.Costanti.UI.VolumeButtons.*;
 
 public class OverlayPausa
 {
     private Playing playing;
     private BufferedImage backgroundImg;
     private int bgX, bgY, bgL, bgA;                         // x, y, larghezza e altezza background
-    private SoundButton musicButton, sfxButton;
+    private OpzioniAudio opzioniAudio;
     private UrmButton menuB, rigiocaB, riprendiB;
-    private VolumeButton volumeButton;
+    private TastoVolume tastoVolume;
 
 
     public OverlayPausa (Playing playing)
     {
         this.playing = playing;
         caricaBackground ();
-        creaSoundButtons ();
+        opzioniAudio = playing.getGioco().getOpzioniAudio();
         creaUrmButtons ();
-        creaVolumeButton ();
-    }
-
-    private void creaVolumeButton ()
-    {
-        int vX = (int) (309 * Gioco.SCALA);
-        int vY = (int) (278 * Gioco.SCALA);
-        volumeButton = new VolumeButton (vX, vY, CURSORE_LARGHEZZA, VOLUME_ALTEZZA);
     }
 
     private void creaUrmButtons ()
@@ -53,15 +41,6 @@ public class OverlayPausa
         riprendiB = new UrmButton (ripendiX, bY, URM_SIZE, URM_SIZE, 0);
     }
 
-    private void creaSoundButtons ()
-    {
-        int soundX = (int) (450 * Gioco.SCALA);
-        int musicY = (int) (140 * Gioco.SCALA);
-        int sfxY = (int) (186 * Gioco.SCALA);
-        musicButton = new SoundButton (soundX, musicY, SOUND_SIZE, SOUND_SIZE);
-        sfxButton = new SoundButton (soundX, sfxY, SOUND_SIZE, SOUND_SIZE);
-    }
-
     private void caricaBackground ()
     {
         backgroundImg = CaricaSalva.GetAtltanteSprite (CaricaSalva.PAUSA_BACKGROUND);
@@ -73,14 +52,12 @@ public class OverlayPausa
 
     public void update ()
     {
-        musicButton.update ();
-        sfxButton.update ();
 
         menuB.update ();
         rigiocaB.update ();
         riprendiB.update ();
 
-        volumeButton.update ();
+        opzioniAudio.update();
     }
 
     public void draw (Graphics g)
@@ -88,25 +65,17 @@ public class OverlayPausa
         // Background
         g.drawImage (backgroundImg, bgX, bgY, bgL, bgA, null);
 
-        // Sound buttons
-        musicButton.draw (g);
-        sfxButton.draw (g);
-
         // Urm buttons
         menuB.draw (g);
         rigiocaB.draw (g);
         riprendiB.draw (g);
 
-        // Cursore volume
-        volumeButton.draw (g);
+        opzioniAudio.draw (g);
     }
 
     public void mouseDragged (MouseEvent e)
     {
-        if (volumeButton.isMousePressed ())
-        {
-            volumeButton.cambiaX (e.getX ());
-        }
+        opzioniAudio.mouseDragged (e);
     }
 
     public void mouseClicked (MouseEvent e)
@@ -114,51 +83,33 @@ public class OverlayPausa
 
     }
 
-    public void mousePressed(MouseEvent e)
+    public void mousePressed (MouseEvent e)
     {
-        if (isIn (e, musicButton))
-        {
-            musicButton.setMousePressed (true);
-        }
-        else if (isIn (e, sfxButton))
-        {
-            sfxButton.setMousePressed (true);
-        }
-        else if (isIn (e, menuB))
+        if (isDentro (e, menuB))
         {
             menuB.setMousePressed (true);
         }
-        else if (isIn (e, rigiocaB))
+        else if (isDentro (e, rigiocaB))
         {
             rigiocaB.setMousePressed (true);
         }
-        else if (isIn (e, riprendiB))
+        else if (isDentro (e, riprendiB))
         {
             riprendiB.setMousePressed (true);
         }
-        else if (isIn (e, volumeButton))
+        else if (isDentro (e, tastoVolume))
         {
-            volumeButton.setMousePressed (true);
+            tastoVolume.setMousePressed (true);
+        }
+        else
+        {
+            opzioniAudio.mousePressed (e);
         }
     }
 
     public void mouseReleased (MouseEvent e)
     {
-        if (isIn (e, musicButton))
-        {
-           if (musicButton.isMousePressed ())
-           {
-               musicButton.setMuted (!musicButton.isMuted ());
-           }
-        }
-        else if (isIn (e, sfxButton))
-        {
-            if (sfxButton.isMousePressed ())
-            {
-                sfxButton.setMuted (!sfxButton.isMuted ());
-            }
-        }
-        else if (isIn (e, menuB))
+        if (isDentro (e, menuB))
         {
             if (menuB.isMousePressed ())
             {
@@ -166,7 +117,7 @@ public class OverlayPausa
                 playing.riprendiGioco ();
             }
         }
-        else if (isIn (e, rigiocaB))
+        else if (isDentro (e, rigiocaB))
         {
             if (rigiocaB.isMousePressed ())
             {
@@ -174,58 +125,53 @@ public class OverlayPausa
                 playing.riprendiGioco ();
             }
         }
-        else if (isIn (e, riprendiB))
+        else if (isDentro (e, riprendiB))
         {
             if (riprendiB.isMousePressed ())
             {
                 playing.riprendiGioco ();
             }
         }
+        else
+        {
+            opzioniAudio.mouseReleased(e);
+        }
 
-        musicButton.resetBools ();
-        sfxButton.resetBools ();
         menuB.resetBools ();
         rigiocaB.resetBools ();
         riprendiB.resetBools ();
-        volumeButton.resetBools ();
     }
 
     public void mouseMoved(MouseEvent e)
     {
-        musicButton.setMouseOver (false);
-        sfxButton.setMouseOver (false);
         menuB.setMouseOver (false);
         rigiocaB.setMouseOver (false);
         riprendiB.setMouseOver (false);
-        volumeButton.setMouseOver (false);
+        tastoVolume.setMouseOver (false);
 
-        if (isIn (e, musicButton))
-        {
-            musicButton.setMouseOver (true);
-        }
-        else if (isIn (e, sfxButton))
-        {
-            sfxButton.setMouseOver (true);
-        }
-        else if (isIn (e, menuB))
+        if (isDentro (e, menuB))
         {
             menuB.setMouseOver (true);
         }
-        else if (isIn (e, rigiocaB))
+        else if (isDentro (e, rigiocaB))
         {
             rigiocaB.setMouseOver (true);
         }
-        else if (isIn (e, riprendiB))
+        else if (isDentro (e, riprendiB))
         {
             riprendiB.setMouseOver (true);
         }
-        else if (isIn (e, volumeButton))
+        else if (isDentro (e, tastoVolume))
         {
-            volumeButton.setMouseOver (true);
+            tastoVolume.setMouseOver (true);
+        }
+        else
+        {
+            opzioniAudio.mouseMoved (e);
         }
     }
 
-    private boolean isIn (MouseEvent e, PauseButton b)
+    private boolean isDentro(MouseEvent e, PauseButton b)
     {
         return b.getLimiti ().contains (e.getX (), e.getY ());
 

@@ -28,6 +28,10 @@ public class KeyboardInputs implements KeyListener
             {
                 pannello.getGioco ().getPlaying ().keyPressed (e);
             }
+            case OPTIONS ->
+            {
+                pannello.getGioco ().getOpzioniGioco ().keyPressed (e);
+            }
             case MENU ->
             {
                 pannello.getGioco ().getMenu ().keyPressed (e);

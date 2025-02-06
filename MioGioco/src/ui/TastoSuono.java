@@ -7,14 +7,14 @@ import java.awt.image.BufferedImage;
 
 import static utilità.Costanti.UI.PauseButtons.*;
 
-public class SoundButton extends PauseButton
+public class TastoSuono extends PauseButton
 {
     private BufferedImage [][] soundImgs;
     private boolean mouseOver, mousePressed;
     private boolean muted;
     private int indiceRiga, indiceColonna;
 
-    public SoundButton (int x, int y, int larghezza, int altezza)
+    public TastoSuono(int x, int y, int larghezza, int altezza)
     {
         super (x, y, larghezza, altezza);
 

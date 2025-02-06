@@ -74,7 +74,7 @@ public class Menu extends Stato implements StatoMetodi
     {
         for (MenuButton mb : buttons)
         {
-            if (isIn (e, mb))
+            if (isDentro(e, mb))
             {
                 mb.setMousePressed (true);
                 break;
@@ -87,7 +87,7 @@ public class Menu extends Stato implements StatoMetodi
     {
         for (MenuButton mb : buttons)
         {
-            if (isIn (e, mb))
+            if (isDentro(e, mb))
             {
                 if (mb.isMousePressed ())
                 {
@@ -119,7 +119,7 @@ public class Menu extends Stato implements StatoMetodi
 
         for (MenuButton mb : buttons)
         {
-            if (isIn (e, mb))
+            if (isDentro(e, mb))
             {
                 mb.setMouseOver (true);
                 break;

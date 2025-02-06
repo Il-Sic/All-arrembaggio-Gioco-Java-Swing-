@@ -11,6 +11,7 @@ import java.awt.event.MouseMotionListener;
 public class MouseInputs implements MouseListener, MouseMotionListener
 {
     private PannelloGioco pannello;
+
     public MouseInputs (PannelloGioco pannello)
     {
         this.pannello = pannello;
@@ -37,6 +38,10 @@ public class MouseInputs implements MouseListener, MouseMotionListener
             {
                 pannello.getGioco ().getPlaying ().mousePressed (e);
             }
+            case OPTIONS ->
+            {
+                pannello.getGioco ().getOpzioniGioco ().mousePressed (e);
+            }
             case MENU ->
             {
                 pannello.getGioco ().getMenu ().mousePressed (e);
@@ -52,6 +57,10 @@ public class MouseInputs implements MouseListener, MouseMotionListener
             case PLAYING ->
             {
                 pannello.getGioco ().getPlaying ().mouseReleased (e);
+            }
+            case OPTIONS ->
+            {
+                pannello.getGioco ().getOpzioniGioco ().mouseReleased (e);
             }
             case MENU ->
             {
@@ -81,6 +90,10 @@ public class MouseInputs implements MouseListener, MouseMotionListener
             {
                 pannello.getGioco ().getPlaying ().mouseDragged (e);
             }
+            case OPTIONS ->
+            {
+                pannello.getGioco().getOpzioniGioco ().mouseDragged (e);
+            }
         }
     }
 
@@ -92,6 +105,10 @@ public class MouseInputs implements MouseListener, MouseMotionListener
             case PLAYING ->
             {
                 pannello.getGioco ().getPlaying ().mouseMoved (e);
+            }
+            case OPTIONS ->
+            {
+                pannello.getGioco ().getOpzioniGioco ().mouseMoved (e);
             }
             case MENU ->
             {

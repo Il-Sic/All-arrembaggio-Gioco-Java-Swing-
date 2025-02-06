@@ -125,14 +125,14 @@ public class Costanti
 
         public static class VolumeButtons
         {
-            public static final int VOLUME_LARGHEZZA_DEFAULT = 28;
-            public static final int VOLUME_ALTEZZA_DEFAULT = 44;
-            public static final int CURSORE_LARGHEZZA_DEFAULT = 215;
+            public static final int LARGHEZZA_VOLUME_DEFAULT = 28;
+            public static final int ALTEZZA_VOLUME_DEFAULT = 44;
+            public static final int LARGHEZZA_CURSORE_DEFAULT = 215;
             //public static final int CURSORE_ALTEZZA_DEFAULT = 45;
 
-            public static final int VOLUME_LARGEZZA = (int) (VOLUME_LARGHEZZA_DEFAULT * Gioco.SCALA);
-            public static final int VOLUME_ALTEZZA = (int) (VOLUME_ALTEZZA_DEFAULT * Gioco.SCALA);
-            public static final int CURSORE_LARGHEZZA = (int) (CURSORE_LARGHEZZA_DEFAULT * Gioco.SCALA);
+            public static final int LARGHEZZA_VOLUME = (int) (LARGHEZZA_VOLUME_DEFAULT * Gioco.SCALA);
+            public static final int ALTEZZA_VOLUME = (int) (ALTEZZA_VOLUME_DEFAULT * Gioco.SCALA);
+            public static final int LARGHEZZA_CURSORE = (int) (LARGHEZZA_CURSORE_DEFAULT * Gioco.SCALA);
             //public static final int CURSORE_ALTEZZA  = (int) (CURSORE_ALTEZZA_DEFAULT * Gioco.SCALA);
         }
     }

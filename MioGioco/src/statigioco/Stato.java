@@ -19,7 +19,7 @@ public class Stato
         return gioco;
     }
 
-    public boolean isIn (MouseEvent e, MenuButton mb)
+    public boolean isDentro(MouseEvent e, MenuButton mb)
     {
         return mb.getLimiti ().contains (e.getX (), e.getY ());
     }

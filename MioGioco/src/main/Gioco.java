@@ -1,8 +1,10 @@
 package main;
 
 import statigioco.Menu;
+import statigioco.OpzioniGioco;
 import statigioco.Playing;
 import statigioco.StatoGioco;
+import ui.OpzioniAudio;
 import utilità.CaricaSalva;
 
 import java.awt.*;
@@ -19,6 +21,8 @@ public class Gioco implements Runnable
 
     private Playing playing;
     private Menu menu;
+    private OpzioniGioco opzioniGioco;
+    private OpzioniAudio opzioniAudio;
 
     public static final int DIMENSIONE_PREDEFINITA_CASELLA = 32;
     public static final float SCALA = 2f;
@@ -42,8 +46,10 @@ public class Gioco implements Runnable
 
     private void initClassi () throws URISyntaxException, IOException
     {
+        opzioniAudio = new OpzioniAudio();
         menu = new Menu (this);
         playing = new Playing (this);
+        opzioniGioco = new OpzioniGioco (this);
     }
 
     private void startGameLoop ()
@@ -68,7 +74,7 @@ public class Gioco implements Runnable
 
             case OPTIONS ->
             {
-
+                opzioniAudio.update();
             }
 
             case QUIT ->
@@ -91,6 +97,11 @@ public class Gioco implements Runnable
             case PLAYING ->
             {
                 playing.draw (g);
+            }
+
+            case OPTIONS ->
+            {
+                opzioniGioco.draw (g);
             }
 
             case MENU ->
@@ -171,5 +182,15 @@ public class Gioco implements Runnable
     public Playing getPlaying ()
     {
         return playing;
+    }
+
+    public OpzioniAudio getOpzioniAudio ()
+    {
+        return opzioniAudio;
+    }
+
+    public OpzioniGioco getOpzioniGioco ()
+    {
+        return opzioniGioco;
     }
 }
