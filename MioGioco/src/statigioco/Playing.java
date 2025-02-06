@@ -35,9 +35,6 @@ public class Playing extends Stato implements StatoMetodi
     private int xLvlOffset;
     private int bordoSin = (int) (0.2 * Gioco.LARGHEZZA_GIOCO);
     private int bordoDes = (int) (0.8 * Gioco.LARGHEZZA_GIOCO);
-//    private int larghezzaCaselleLvl  = CaricaSalva.GetDatiLivello () [0].length;
-//    private int maxCaselleOffset = larghezzaCaselleLvl - Gioco.LARGHEZZA_CASELLA;
-//    private int maxXLvlOffset = maxCaselleOffset * Gioco.DIMENSIONE_CASELLA;
     private int maxXLvlOffset;
 
     private BufferedImage immagineBackgound, grandeNuvola, piccolaNuvola;
@@ -46,6 +43,7 @@ public class Playing extends Stato implements StatoMetodi
 
     private boolean gameOver = false;
     private boolean lvlCompletato = false;
+    private boolean morteGiocatore = false;
 
     public Playing (Gioco gioco) throws URISyntaxException, IOException
     {
@@ -63,7 +61,6 @@ public class Playing extends Stato implements StatoMetodi
         }
 
         calcolaLvlOffset ();
-
         caricaInizioLivello ();
     }
 
@@ -127,13 +124,21 @@ public class Playing extends Stato implements StatoMetodi
         {
             overlayLivelloCompletato.update();
         }
-        else if (!gameOver)
+        else if (gameOver)
         {
-            gestioneLivello.update ();
-            gestoreOggetto.update (gestioneLivello.getLivelloCorrente ().getDatiLvl(), giocatore);
-            giocatore.update ();
-            gestioneNemico.update (gestioneLivello.getLivelloCorrente().getDatiLvl(), giocatore);
-            controllaVicinoBordo ();
+            overlayGameOver.update();
+        }
+        else if (morteGiocatore)
+        {
+            giocatore.update();
+        }
+        else
+        {
+            gestioneLivello.update();
+            gestoreOggetto.update(gestioneLivello.getLivelloCorrente().getDatiLvl(), giocatore);
+            giocatore.update();
+            gestioneNemico.update(gestioneLivello.getLivelloCorrente().getDatiLvl(), giocatore);
+            controllaVicinoBordo();
         }
     }
 
@@ -228,6 +233,10 @@ public class Playing extends Stato implements StatoMetodi
                 overlayLivelloCompletato.mousePressed(e);
             }
         }
+        else
+        {
+            overlayGameOver.mousePressed (e);
+        }
     }
 
     @Override
@@ -244,6 +253,10 @@ public class Playing extends Stato implements StatoMetodi
                 overlayLivelloCompletato.mouseReleased (e);
             }
         }
+        else
+        {
+            overlayGameOver.mouseReleased (e);
+        }
     }
 
     @Override
@@ -259,6 +272,10 @@ public class Playing extends Stato implements StatoMetodi
             {
                 overlayLivelloCompletato.mouseMoved (e);
             }
+        }
+        else
+        {
+            overlayGameOver.mouseMoved (e);
         }
     }
 
@@ -346,6 +363,7 @@ public class Playing extends Stato implements StatoMetodi
         gameOver = false;
         inPausa = false;
         lvlCompletato = false;
+        morteGiocatore = false;
         giocatore.resettaTutto ();
         gestioneNemico.resettaTuttoNemici ();
         gestoreOggetto.resettaTuttiOggetti();
@@ -399,5 +417,10 @@ public class Playing extends Stato implements StatoMetodi
     public void setLivelloCompletato (boolean livelloCompletato)
     {
         this.lvlCompletato = livelloCompletato;
+    }
+
+    public void setMorteGiocatore (boolean morteGiocatore)
+    {
+        this.morteGiocatore = morteGiocatore;
     }
 }

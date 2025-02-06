@@ -77,7 +77,22 @@ public class Giocatore extends Entità
 
         if (vitaCorrente <= 0)
         {
-            playing.setGameOver (true);
+            if (stato != MORTE)
+            {
+                stato = MORTE;
+                tickAni = 0;
+                indiceAni = 0;
+                playing.setMorteGiocatore (true);
+            }
+            else if (indiceAni == GetSpriteCont (MORTE) - 1 && tickAni >= VEL_ANI - 1)
+            {
+                playing.setGameOver(true);
+            }
+            else
+            {
+                updateTickAnimazioni();
+            }
+
             return;
         }
 
