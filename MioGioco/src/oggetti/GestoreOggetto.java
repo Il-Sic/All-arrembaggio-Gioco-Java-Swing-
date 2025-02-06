@@ -12,19 +12,23 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import static utilità.Costanti.CostantiOggetto.*;
+import static utilità.Costanti.Proiettili.ALTEZZA_PALLA_CANNONE;
+import static utilità.Costanti.Proiettili.LARGHEZZA_PALLA_CANNONE;
+import static utilità.MetodiUtili.IsProiettileColpisceLivello;
 import static utilità.MetodiUtili.PuòCannoneVedereGiocatore;
 
 public class GestoreOggetto
 {
     private Playing playing;
     private BufferedImage [][] imgsPozione, imgsContenitore;
-    private BufferedImage imgSpuntone;
+    private BufferedImage imgSpuntone, imgPallaCannone;
     private BufferedImage [] imgsCannone;
 
     private ArrayList <Pozione> pozioni;
     private ArrayList <ContenitoreGioco> contenitori;
     private ArrayList <Spuntone> spuntoni;
     private ArrayList <Cannone> cannoni;
+    private ArrayList <Proiettile> proiettili = new ArrayList<>();
 
     public GestoreOggetto (Playing playing)
     {
@@ -80,8 +84,12 @@ public class GestoreOggetto
                 {
                     contGio.setAnimazione (true);
                     int type = 0;
+
                     if (contGio.getTipoOggetto () == BARILE)
+                    {
                         type = 1;
+                    }
+
                     pozioni.add(new Pozione ((int) (contGio.getHitbox().x + contGio.getHitbox().width / 2), (int) (contGio.getHitbox().y - contGio.getHitbox().height / 2), type));
                     return;
                 }
@@ -95,12 +103,13 @@ public class GestoreOggetto
         contenitori = new ArrayList <> (nuovoLivello.getContenitori ());
         spuntoni = nuovoLivello.getSpuntoni ();
         cannoni = nuovoLivello.getCannoni ();
+        proiettili.clear();
     }
 
     private void caricaImgs ()
     {
         BufferedImage potionSprite = CaricaSalva.GetAtltanteSprite(CaricaSalva.ATLANTE_POZIONE);
-        imgsPozione = new BufferedImage[2][7];
+        imgsPozione = new BufferedImage [2][7];
 
         for (int j = 0; j < imgsPozione.length; j++)
         {
@@ -111,13 +120,13 @@ public class GestoreOggetto
         }
 
         BufferedImage containerSprite = CaricaSalva.GetAtltanteSprite(CaricaSalva.ATLANTE_CONTENITORE);
-        imgsContenitore = new BufferedImage[2][8];
+        imgsContenitore = new BufferedImage [2][8];
 
         for (int j = 0; j < imgsContenitore.length; j++)
         {
             for (int i = 0; i < imgsContenitore [j].length; i++)
             {
-                imgsContenitore[j][i] = containerSprite.getSubimage (40 * i, 30 * j, 40, 30);
+                imgsContenitore [j][i] = containerSprite.getSubimage (40 * i, 30 * j, 40, 30);
             }
         }
 
@@ -128,8 +137,10 @@ public class GestoreOggetto
 
         for (int i = 0; i < imgsCannone.length; i ++)
         {
-            imgsCannone [i] = temp.getSubimage (i * 40, 0, 40, 26);
+            imgsCannone [i] = temp.getSubimage (40 * i, 0, 40, 26);
         }
+
+        imgPallaCannone = CaricaSalva.GetAtltanteSprite (CaricaSalva.PALLA_CANNONE);
     }
 
     public void update (int [][] datiLvl, Giocatore giocatore)
@@ -151,6 +162,27 @@ public class GestoreOggetto
         }
 
         updateCannoni (datiLvl, giocatore);
+        updateProiettili (datiLvl, giocatore);
+    }
+
+    private void updateProiettili (int[][] datiLvl, Giocatore giocatore)
+    {
+        for (Proiettile proiettile : proiettili)
+        {
+            if (proiettile.isAttivo())
+            {
+                proiettile.updatePos();
+
+                if (proiettile.getHitbox().intersects(giocatore.getHitbox()))
+                {
+                    giocatore.cambiaVita(-25);
+                    proiettile.setAttivo(false);
+                } else if (IsProiettileColpisceLivello (proiettile, datiLvl))
+                {
+                    proiettile.setAttivo(false);
+                }
+            }
+        }
     }
 
     private boolean isGiocatoreNelRange (Cannone cannone, Giocatore giocatore)
@@ -189,9 +221,9 @@ public class GestoreOggetto
                     {
                         if (isGiocatoreDifronteCannone (cannone, giocatore))
                         {
-                            if (PuòCannoneVedereGiocatore (datiLvl, giocatore.getHitbox(), cannone.getHitbox(), cannone.getCasellaY()))
+                            if (PuòCannoneVedereGiocatore(datiLvl, giocatore.getHitbox(), cannone.getHitbox(), cannone.getCasellaY()))
                             {
-                                sparoCannone (cannone);
+                                cannone.setAnimazione(true);
                             }
                         }
                     }
@@ -199,11 +231,23 @@ public class GestoreOggetto
             }
 
             cannone.update();
+
+            if (cannone.getIndiceAni() == 4 && cannone.getTickAni() == 0)
+            {
+                sparoCannone (cannone);
+            }
         }
     }
     private void sparoCannone (Cannone cannone)
     {
-        cannone.setAnimazione (true);
+        int dir = 1;
+
+        if (cannone.getTipoOggetto() == CANNONE_SINISTRA)
+        {
+            dir = -1;
+        }
+
+        proiettili.add (new Proiettile ((int) cannone.getHitbox().x, (int) cannone.getHitbox().y, dir));
     }
 
     public void draw (Graphics g, int xLvlOffset)
@@ -212,6 +256,18 @@ public class GestoreOggetto
         drawContenitori (g, xLvlOffset);
         drawTrappole (g, xLvlOffset);
         drawCannoni (g, xLvlOffset);
+        drawProiettili (g, xLvlOffset);
+    }
+
+    private void drawProiettili(Graphics g, int xLvlOffset)
+    {
+        for (Proiettile proiettile : proiettili)
+        {
+            if (proiettile.isAttivo())
+            {
+                g.drawImage (imgPallaCannone, (int) (proiettile.getHitbox().x - xLvlOffset), (int) (proiettile.getHitbox().y), LARGHEZZA_PALLA_CANNONE, ALTEZZA_PALLA_CANNONE, null);
+            }
+        }
     }
 
     private void drawCannoni (Graphics g, int xLvlOffset)
@@ -236,11 +292,6 @@ public class GestoreOggetto
         for (Spuntone s : spuntoni)
         {
             g.drawImage (imgSpuntone, (int) (s.getHitbox ().x - xLvlOffset), (int) (s.getHitbox().y - s.getYDrawOffset ()), LARGHEZZA_SPUNTONE, ALTEZZA_SPUNTONE, null);
-        }
-
-        for (Cannone c : cannoni)
-        {
-            c.resetta();
         }
     }
 

@@ -2,10 +2,7 @@ package utilità;
 
 import entità.Granchio;
 import main.Gioco;
-import oggetti.Cannone;
-import oggetti.ContenitoreGioco;
-import oggetti.Pozione;
-import oggetti.Spuntone;
+import oggetti.*;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -181,6 +178,12 @@ public class MetodiUtili
             return SonoTutteCasellePulite (primaXTile, secondaXTile, casellaY, datiLvl);
         }
     }
+
+    public static boolean IsProiettileColpisceLivello (Proiettile p, int[][] datiLvl)
+    {
+        return isSolido (p.getHitbox().x + p.getHitbox().width / 2, p.getHitbox().y + p.getHitbox().height / 2, datiLvl);
+    }
+
 
     public static int [][] GetDatiLivello (BufferedImage img)
     {

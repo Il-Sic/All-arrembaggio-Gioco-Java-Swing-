@@ -17,11 +17,11 @@ public class OggettoGioco
     protected int tickAni, indiceAni;
     protected int xDrawOffset, yDrawOffset;
 
-    public OggettoGioco(int x, int y, int objType)
+    public OggettoGioco(int x, int y, int tipoOggetto)
     {
         this.x = x;
         this.y = y;
-        this.tipoOggetto = objType;
+        this.tipoOggetto = tipoOggetto;
     }
 
     protected void updateTickAnimazione ()
@@ -116,5 +116,10 @@ public class OggettoGioco
     public int getIndiceAni ()
     {
         return indiceAni;
+    }
+
+    public int getTickAni ()
+    {
+        return tickAni;
     }
 }

@@ -19,8 +19,8 @@ public class Costanti
         public static final int COLPO = 3;
         public static final int MORTE = 4;
 
-        public static final int ALTEZZA_GRANCHIO_DEFAULT = 32;
         public static final int LARGHEZZA_GRANCHIO_DEFAULT = 72;
+        public static final int ALTEZZA_GRANCHIO_DEFAULT = 32;
 
         public static final int ALTEZZA_GRANCHIO = (int) (ALTEZZA_GRANCHIO_DEFAULT * Gioco.SCALA);
         public static final int LARGHEZZA_GRANCHIO = (int) (LARGHEZZA_GRANCHIO_DEFAULT * Gioco.SCALA);
@@ -140,10 +140,7 @@ public class Costanti
     public static class Direzioni
     {
         public static final int SINISTRA = 0;
-        public static final int SU = 1;
         public static final int DESTRA = 2;
-        public static final int SOTTO = 3;
-
     }
 
     public static class CostantiGiocatore
@@ -166,7 +163,7 @@ public class Costanti
                 case COLPO -> 4;
                 case SALTO, ATTACCO -> 3;
                 case CADUTA -> 1;
-                default -> 1;                   // e anche CADUTA
+                default -> 1;
             };
         }
     }
@@ -188,14 +185,17 @@ public class Costanti
         public static final int ALTEZZA_CONTENITORE_DEFAULT = 30;
         public static final int LARGHEZZA_CONTENITORE = (int) (Gioco.SCALA * LARGHEZZA_CONTENITORE_DEFAULT);
         public static final int ALTEZZA_CONTENITORE = (int) (Gioco.SCALA * ALTEZZA_CONTENITORE_DEFAULT);
+
         public static final int LARGHEZZA_POZIONE_DEFAULT = 12;
         public static final int ALTEZZA_POZIONE_DEFAULT = 16;
         public static final int LARGHEZZA_POZIONE = (int) (Gioco.SCALA * LARGHEZZA_POZIONE_DEFAULT);
         public static final int ALTEZZA_POZIONE = (int) (Gioco.SCALA * ALTEZZA_POZIONE_DEFAULT);
+
         public static final int LARGHEZZA_SPUNTONE_DEFAULT = 32;
         public static final int ALTEZZA_SPUNTONE_DEFAULT = 32;
         public static final int LARGHEZZA_SPUNTONE = (int) (Gioco.SCALA * LARGHEZZA_SPUNTONE_DEFAULT);
         public static final int ALTEZZA_SPUNTONE = (int) (Gioco.SCALA * ALTEZZA_SPUNTONE_DEFAULT);
+
         public static final int LARGHEZZA_CANNONE_DEFAULT = 40;
         public static final int ALTEZZA_CANNONE_DEFAULT = 26;
         public static final int LARGHEZZA_CANNONE = (int) (Gioco.SCALA * LARGHEZZA_CANNONE_DEFAULT);
@@ -212,5 +212,15 @@ public class Costanti
                 default -> 1;
             };
         }
+    }
+
+    public static class Proiettili
+    {
+        public static final int LARGHEZZA_PALLA_CANNONE_DEFAULT = 15;
+        public static final int ALTEZZA_PALLA_CANNONE_DEFAULT = 15;
+
+        public static final int LARGHEZZA_PALLA_CANNONE = (int)(Gioco.SCALA * LARGHEZZA_PALLA_CANNONE_DEFAULT);
+        public static final int ALTEZZA_PALLA_CANNONE = (int)(Gioco.SCALA * ALTEZZA_PALLA_CANNONE_DEFAULT);
+        public static final float VEL_PALLA_CANNONE = 0.75f * Gioco.SCALA;
     }
 }
