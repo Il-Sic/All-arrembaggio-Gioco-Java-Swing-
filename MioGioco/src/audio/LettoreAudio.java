@@ -19,7 +19,7 @@ public class LettoreAudio
     public static int ATTACCO_TRE = 6;
     private Clip[] suoni, effetti;
     private int idCanzoneCorrente;
-    private float volume = 1f;
+    private float volume = 0.5f;
     private boolean mutaCanzone, mutaEffetto;
     private Random rand = new Random();
 
@@ -43,7 +43,7 @@ public class LettoreAudio
 
     private void caricaEffetti()
     {
-        String[] nomiEffetti = { "muori", "salto", "gameover", "lvlcompletato", "attacco1", "attacco2", "attacco3" };
+        String[] nomiEffetti = { "morte", "salto", "gameover", "lvlcompletato", "attacco1", "attacco2", "attacco3" };
         effetti = new Clip[nomiEffetti.length];
 
         for (int i = 0; i < effetti.length; i++)

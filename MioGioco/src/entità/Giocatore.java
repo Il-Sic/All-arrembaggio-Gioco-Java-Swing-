@@ -42,8 +42,15 @@ public class Giocatore extends Entità
     private int altezzaBarraVita = (int) (4 * Gioco.SCALA);
     private int xInizioBarraVita = (int) (34 * Gioco.SCALA);
     private int yInizioBarraVita = (int) (14 * Gioco.SCALA);
-
     private int larghezzaVita = larghezzaBarraVita;
+
+    private int larghezzaBarraForza = (int) (104 * Gioco.SCALA);
+    private int altezzaBarraForza = (int) (2 * Gioco.SCALA);
+    private int barraForzaXStart = (int) (44 * Gioco.SCALA);
+    private int barraForzaYStart = (int) (34 * Gioco.SCALA);
+    private int larghezzaForza = larghezzaBarraForza;
+    private int valoreForzaMax = 200;
+    private int valoreForza = valoreForzaMax;
 
     private int xFlip = 0;
     private int lFlip = 1;
@@ -52,6 +59,11 @@ public class Giocatore extends Entità
     private Playing playing;
 
     private int casellaY = 0;
+
+    private boolean forzaAttaccoAttiva;
+    private int forzaAttaccoTick;
+    private int forzaAumentaVel = 15;
+    private int forzaAumentaTick;
 
     public Giocatore (float x, float y, int larghezza, int altezza, Playing playing)
     {
@@ -76,6 +88,7 @@ public class Giocatore extends Entità
     public void update ()
     {
         updateBarraVita ();
+        updateBarraForza ();
 
         if (vitaCorrente <= 0)
         {
@@ -111,15 +124,39 @@ public class Giocatore extends Entità
             controllaSpuntoniToccati ();
 
             casellaY = (int) (hitbox.y / Gioco.DIMENSIONE_CASELLA);
+
+            if (forzaAttaccoAttiva)
+            {
+                forzaAttaccoTick ++;
+
+                if (forzaAttaccoTick >= 35)
+                {
+                    forzaAttaccoTick = 0;
+                    forzaAttaccoAttiva = false;
+                }
+            }
         }
 
-        if (attacco)
+        if (attacco || forzaAttaccoAttiva)
         {
             controllaAttacco ();
         }
 
         updateTickAnimazioni ();
         setAnimazione ();
+    }
+
+    private void updateBarraForza()
+    {
+        larghezzaForza = (int) ((valoreForza / (float) valoreForzaMax) * larghezzaBarraForza);
+
+        forzaAumentaTick ++;
+
+        if (forzaAumentaTick >= forzaAumentaVel)
+        {
+            forzaAumentaTick = 0;
+            cambiaForza (1);
+        }
     }
 
     private void controllaSpuntoniToccati ()
@@ -146,6 +183,11 @@ public class Giocatore extends Entità
 
         attaccoControllato = true;
 
+        if (forzaAttaccoAttiva)
+        {
+            attaccoControllato = false;
+        }
+
         playing.controllaColpoNemico (attackBox);
         playing.controllaHitOggetto (attackBox);
         playing.getGioco().getLettoreAudio().riproduciSuonoAttacco();
@@ -153,11 +195,11 @@ public class Giocatore extends Entità
 
     private void updateAttackBox ()
     {
-        if (destra)
+        if (destra || forzaAttaccoAttiva && lFlip == 1)
         {
             attackBox.x = hitbox.x + hitbox.width + (int) (Gioco.SCALA * 10);
         }
-        else if (sinistra)
+        else if (sinistra || forzaAttaccoAttiva && lFlip == -1)
         {
             attackBox.x = hitbox.x - hitbox.width - (int) (Gioco.SCALA * 10);
         }
@@ -186,7 +228,31 @@ public class Giocatore extends Entità
 
     public void cambiaForza (int valore)
     {
-        System.out.println ("Forza migliorata");
+        valoreForza += valore;
+
+        if (valoreForza >= valoreForzaMax)
+        {
+            valoreForza = valoreForzaMax;
+        }
+
+        else if (valoreForza <= 0)
+        {
+            valoreForza = 0;
+        }
+    }
+
+    public void forzaAttacco ()
+    {
+        if (forzaAttaccoAttiva)
+        {
+            return;
+        }
+
+        if (valoreForza >= 60)
+        {
+            forzaAttaccoAttiva = true;
+            cambiaForza (-60);
+        }
     }
 
     public void render (Graphics g, int lvlOffset)
@@ -202,8 +268,12 @@ public class Giocatore extends Entità
     private void drawUI (Graphics g)
     {
         g.drawImage (barraStatoImg, xBarraStato, yBarraStato, larghezzaBarraStato, altezzaBarraStato,null);
+
         g.setColor (Color.red);
         g.fillRect (xInizioBarraVita + xBarraStato, yInizioBarraVita + yBarraStato, larghezzaVita, altezzaBarraVita);
+
+        g.setColor(Color.yellow);
+        g.fillRect (barraForzaXStart + xBarraStato, barraForzaYStart + yBarraStato, larghezzaForza, altezzaBarraForza);
     }
 
 
@@ -255,6 +325,15 @@ public class Giocatore extends Entità
             }
         }
 
+        if (forzaAttaccoAttiva)
+        {
+            stato = ATTACCO;
+            indiceAni = 1;
+            tickAni = 0;
+
+            return;
+        }
+
         if (attacco)
         {
             stato = ATTACCO;
@@ -263,6 +342,7 @@ public class Giocatore extends Entità
             {
                 indiceAni = 1;
                 tickAni = 0;
+
                 return;
             }
         }
@@ -300,9 +380,12 @@ public class Giocatore extends Entità
 
         if (!inAria)
         {
-            if ((!sinistra && !destra) || (sinistra && destra))
+            if (!forzaAttaccoAttiva)
             {
-                return;
+                if ((!sinistra && !destra) || (sinistra && destra))
+                {
+                    return;
+                }
             }
         }
 
@@ -324,6 +407,23 @@ public class Giocatore extends Entità
             lFlip = 1;
         }
 
+        if (forzaAttaccoAttiva)
+        {
+            if (!sinistra && !destra)
+            {
+                if (lFlip == -1)
+                {
+                    velX = -velPg;
+                }
+                else
+                {
+                    velX = velPg;
+                }
+            }
+
+            velX *= 3;
+        }
+
         if (!inAria)
         {
             if (!isEntitàSulPavimento(hitbox, datiLvl))
@@ -332,13 +432,13 @@ public class Giocatore extends Entità
             }
         }
 
-        if (inAria)
+        if (inAria && !forzaAttaccoAttiva)
         {
             if (puòMuoversiQui(hitbox.x, hitbox.y + velAria, hitbox.width, hitbox.height, datiLvl))
             {
                 hitbox.y += velAria;
                 velAria += GRAVIOL;
-                updatePosX(velX);
+                updatePosX (velX);
             }
             else
             {
@@ -382,7 +482,7 @@ public class Giocatore extends Entità
         velAria = 0f;
     }
 
-    private void updatePosX(float velX)
+    private void updatePosX (float velX)
     {
         if (puòMuoversiQui(hitbox.x + velX, hitbox.y, hitbox.width, hitbox.height, datiLvl))
         {
@@ -390,7 +490,13 @@ public class Giocatore extends Entità
         }
         else
         {
-            hitbox.x = getPosizioneEntitàVicinoAlMuroX(hitbox, velX);
+            hitbox.x = getPosizioneEntitàVicinoAlMuroX (hitbox, velX);
+
+            if (forzaAttaccoAttiva)
+            {
+                forzaAttaccoAttiva = false;
+                forzaAttaccoTick = 0;
+            }
         }
 
     }

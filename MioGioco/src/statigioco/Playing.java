@@ -216,6 +216,10 @@ public class Playing extends Stato implements StatoMetodi
             {
                 giocatore.setAttacco(true);
             }
+            else if (e.getButton() == MouseEvent.BUTTON3)
+            {
+                giocatore.forzaAttacco();
+            }
         }
     }
 
