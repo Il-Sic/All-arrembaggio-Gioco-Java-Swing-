@@ -34,6 +34,19 @@ public class CaricaSalva
     public static final String PALLA_CANNONE = "ball.png";
     public static final String SCHERMATA_MORTE = "death_screen.png";
     public static final String OPZIONI_MENU = "options_background.png";
+    public static final String ATLANTE_STELLA = "pinkstar_atlas.png";
+    public static final String ATLANTE_DOMANDA = "question_atlas.png";
+    public static final String ATLANTE_ESCLAMAZIONE = "exclamation_atlas.png";
+    public static final String ATLANTE_SQUALO = "shark_atlas.png";
+    public static final String ATLANTE_ERBA = "grass_atlas.png";
+    public static final String ATLANTE_ALBERO_UNO = "tree_one_atlas.png";
+    public static final String ATLANTE_ALBERO_DUE = "tree_two_atlas.png";
+    public static final String GIOCO_COMPLETATO = "game_completed.png";
+    public static final String PARTICELLE_PIOGGIA = "rain_particle.png";
+    public static final String ACQUA_SUPERFICIE = "water_atlas_animation.png";
+    public static final String ACQUA_FONDALE = "water.png";
+    public static final String BARCA = "ship.png";
+
 
     public static BufferedImage GetAtltanteSprite (String nomeFile)                        // restituisce un immagine memorizzata nel buffer
     {

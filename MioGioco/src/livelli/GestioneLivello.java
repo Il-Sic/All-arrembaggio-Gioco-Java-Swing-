@@ -13,29 +13,32 @@ import java.util.ArrayList;
 public class GestioneLivello
 {
     private Gioco gioco;
-    private BufferedImage [] spriteLivello;
+    private BufferedImage [] spriteLivello, spriteAcqua;
     private ArrayList <Livello> livelli;
-    private int indiceLvl = 0;
+    private int indiceLvl = 0, tickAni, indiceAni;
 
     public GestioneLivello (Gioco gioco) throws URISyntaxException, IOException
     {
         this.gioco = gioco;
         importaSpritesEsterni ();
+        creaAcqua ();
         livelli = new ArrayList<>();
         costruisciTuttiLivelli ();
     }
 
+    private void creaAcqua()
+    {
+        spriteAcqua = new BufferedImage[5];
+        BufferedImage img = CaricaSalva.GetAtltanteSprite(CaricaSalva.ACQUA_SUPERFICIE);
+        for (int i = 0; i < 4; i++)
+        {
+            spriteAcqua[i] = img.getSubimage(i * 32, 0, 32, 32);
+        }
+        spriteAcqua[4] = CaricaSalva.GetAtltanteSprite(CaricaSalva.ACQUA_FONDALE);
+    }
+
     public void caricaLivelloSuccessivo ()
     {
-        indiceLvl ++;
-
-        if (indiceLvl >= livelli.size())
-        {
-            indiceLvl = 0;
-            System.out.println("Hai finito il gioco! Complimenti!");
-            StatoGioco.stato = StatoGioco.MENU;
-        }
-
         Livello nuovoLivello = livelli.get (indiceLvl);
         gioco.getPlaying ().getGestioneNemico ().caricaNemici (nuovoLivello);
         gioco.getPlaying ().getGiocatore ().caricaDatiLvl (nuovoLivello.getDatiLvl ());
@@ -70,17 +73,47 @@ public class GestioneLivello
 
     public void draw (Graphics g, int lvlOffset)
     {
-        for (int j = 0; j < Gioco.ALTEZZA_CASELLA; j ++)
+        for (int j = 0; j < Gioco.ALTEZZA_CASELLA; j++)
         {
-            for (int i = 0; i < livelli.get (indiceLvl).getDatiLvl () [0].length; i ++)
+            for (int i = 0; i < livelli.get(indiceLvl).getDatiLvl()[0].length; i++)
             {
-                int indice = livelli.get (indiceLvl).getIndiceSprite (i, j);
-                g.drawImage (spriteLivello [indice], Gioco.DIMENSIONE_CASELLA * i - lvlOffset, Gioco.DIMENSIONE_CASELLA * j, Gioco.DIMENSIONE_CASELLA, Gioco.DIMENSIONE_CASELLA, null);
+                int index = livelli.get(indiceLvl).getIndiceSprite(i, j);
+                int x = Gioco.DIMENSIONE_CASELLA * i - lvlOffset;
+                int y = Gioco.DIMENSIONE_CASELLA * j;
+
+                if (index == 48)
+                {
+                    g.drawImage(spriteAcqua[indiceAni], x, y, Gioco.DIMENSIONE_CASELLA, Gioco.DIMENSIONE_CASELLA, null);
+                }
+                else if (index == 49)
+                {
+                    g.drawImage(spriteAcqua[4], x, y, Gioco.DIMENSIONE_CASELLA, Gioco.DIMENSIONE_CASELLA, null);
+                }
+                else
+                {
+                    g.drawImage(spriteLivello[index], x, y, Gioco.DIMENSIONE_CASELLA, Gioco.DIMENSIONE_CASELLA, null);
+                }
             }
         }
     }
     public void update ()
     {
+        updateAnimazioneAcqua ();
+    }
+
+    private void updateAnimazioneAcqua()
+    {
+        tickAni++;
+        if (tickAni >= 40)
+        {
+            tickAni = 0;
+            indiceAni++;
+
+            if (indiceAni >= 4)
+            {
+                indiceAni = 0;
+            }
+        }
     }
 
     public Livello getLivelloCorrente ()
@@ -96,5 +129,10 @@ public class GestioneLivello
     public int getIndiceLivello ()
     {
         return indiceLvl;
+    }
+
+    public void setIndiceLivello (int indiceLivello)
+    {
+        this.indiceLvl = indiceLvl;
     }
 }

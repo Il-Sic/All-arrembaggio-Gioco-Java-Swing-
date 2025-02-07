@@ -20,25 +20,27 @@ import static utilità.MetodiUtili.PuòCannoneVedereGiocatore;
 public class GestoreOggetto
 {
     private Playing playing;
-    private BufferedImage [][] imgsPozione, imgsContenitore;
+    private BufferedImage [][] imgsPozione, imgsContenitore, imgsAlberi;
     private BufferedImage imgSpuntone, imgPallaCannone;
-    private BufferedImage [] imgsCannone;
+    private BufferedImage [] imgsCannone, imgsErba;
 
     private ArrayList <Pozione> pozioni;
     private ArrayList <ContenitoreGioco> contenitori;
-    private ArrayList <Spuntone> spuntoni;
-    private ArrayList <Cannone> cannoni;
     private ArrayList <Proiettile> proiettili = new ArrayList<>();
+
+    private Livello livelloCorrente;
 
     public GestoreOggetto (Playing playing)
     {
         this.playing = playing;
+        livelloCorrente = playing.getGestioneLivello().getLivelloCorrente();
+
         caricaImgs ();
     }
 
     public void controllaSpuntoniToccati (Giocatore giocatore)
     {
-        for (Spuntone s : spuntoni)
+        for (Spuntone s : livelloCorrente.getSpuntoni())
         {
             if (s.getHitbox().intersects (giocatore.getHitbox()))
             {
@@ -99,10 +101,9 @@ public class GestoreOggetto
 
     public void caricaOggetti (Livello nuovoLivello)
     {
+        livelloCorrente = nuovoLivello;
         pozioni = new ArrayList <> (nuovoLivello.getPozioni ());
         contenitori = new ArrayList <> (nuovoLivello.getContenitori ());
-        spuntoni = nuovoLivello.getSpuntoni ();
-        cannoni = nuovoLivello.getCannoni ();
         proiettili.clear();
     }
 
@@ -141,6 +142,26 @@ public class GestoreOggetto
         }
 
         imgPallaCannone = CaricaSalva.GetAtltanteSprite (CaricaSalva.PALLA_CANNONE);
+
+        imgsAlberi = new BufferedImage[2][4];
+        BufferedImage imgAlberoUno = CaricaSalva.GetAtltanteSprite(CaricaSalva.ATLANTE_ALBERO_UNO);
+        for (int i = 0; i < 4; i++)
+        {
+            imgsAlberi[0][i] = imgAlberoUno.getSubimage(i * 39, 0, 39, 92);
+        }
+
+        BufferedImage imgAlberoDue = CaricaSalva.GetAtltanteSprite(CaricaSalva.ATLANTE_ALBERO_DUE);
+        for (int i = 0; i < 4; i++)
+        {
+            imgsAlberi[1][i] = imgAlberoDue.getSubimage(i * 62, 0, 62, 54);
+        }
+
+        BufferedImage grassTemp = CaricaSalva.GetAtltanteSprite(CaricaSalva.ATLANTE_ERBA);
+        imgsErba = new BufferedImage[2];
+        for (int i = 0; i < imgsErba.length; i++)
+        {
+            imgsErba[i] = grassTemp.getSubimage(32 * i, 0, 32, 32);
+        }
     }
 
     public void update (int [][] datiLvl, Giocatore giocatore)
@@ -163,6 +184,14 @@ public class GestoreOggetto
 
         updateCannoni (datiLvl, giocatore);
         updateProiettili (datiLvl, giocatore);
+    }
+
+    private void updateAlberiBackground ()
+    {
+        for (AlberiBackground aB : livelloCorrente.getAlberi ())
+        {
+            aB.update();
+        }
     }
 
     private void updateProiettili (int[][] datiLvl, Giocatore giocatore)
@@ -211,7 +240,7 @@ public class GestoreOggetto
 
     private void updateCannoni (int[][] datiLvl, Giocatore giocatore)
     {
-        for (Cannone cannone : cannoni)
+        for (Cannone cannone : livelloCorrente.getCannoni())
         {
             if (!cannone.faiAnimazione)
             {
@@ -257,6 +286,29 @@ public class GestoreOggetto
         drawTrappole (g, xLvlOffset);
         drawCannoni (g, xLvlOffset);
         drawProiettili (g, xLvlOffset);
+        drawErba (g, xLvlOffset);
+    }
+
+    private void drawErba(Graphics g, int xLvlOffset)
+    {
+        for (Erba erba : livelloCorrente.getErba())
+        {
+            g.drawImage(imgsErba[erba.getTipo()], erba.getX() - xLvlOffset, erba.getY(), (int) (32 * Gioco.SCALA), (int) (32 * Gioco.SCALA), null);
+        }
+    }
+
+    public void drawAlberiBackground (Graphics g, int xLvlOffset)
+    {
+        for (AlberiBackground aB : livelloCorrente.getAlberi ())
+        {
+
+            int tipo = aB.getTipo();
+            if (tipo == 9)
+            {
+                tipo = 8;
+            }
+            g.drawImage(imgsAlberi[tipo - 7][aB.getIndiceAni()], aB.getX() - xLvlOffset + GetAlberoOffsetX(aB.getTipo()), (int) (aB.getY() + GetAlberoOffsetY(aB.getTipo())), GetLarghezzaAlbero(aB.getTipo()), GetAltezzaAlbero(aB.getTipo()), null);
+        }
     }
 
     private void drawProiettili(Graphics g, int xLvlOffset)
@@ -272,7 +324,7 @@ public class GestoreOggetto
 
     private void drawCannoni (Graphics g, int xLvlOffset)
     {
-        for (Cannone c : cannoni)
+        for (Cannone c : livelloCorrente.getCannoni())
         {
             int x = (int) (c.getHitbox().x - xLvlOffset);
             int larghezza = LARGHEZZA_CANNONE;
@@ -289,7 +341,7 @@ public class GestoreOggetto
 
     private void drawTrappole (Graphics g, int xLvlOffset)
     {
-        for (Spuntone s : spuntoni)
+        for (Spuntone s : livelloCorrente.getSpuntoni())
         {
             g.drawImage (imgSpuntone, (int) (s.getHitbox ().x - xLvlOffset), (int) (s.getHitbox().y - s.getYDrawOffset ()), LARGHEZZA_SPUNTONE, ALTEZZA_SPUNTONE, null);
         }

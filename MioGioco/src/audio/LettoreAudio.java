@@ -118,7 +118,11 @@ public class LettoreAudio
 
     public void riproduciEffetto(int effetto)
     {
-        effetti[effetto].setMicrosecondPosition(0);
+        if (effetti[effetto].getMicrosecondPosition () > 0)
+        {
+            effetti[effetto].setMicrosecondPosition(0);
+        }
+
         effetti[effetto].start();
     }
 

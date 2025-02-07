@@ -5,6 +5,9 @@ import main.Gioco;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
+import static utilità.Costanti.Direzioni.*;
+import static utilità.MetodiUtili.PuòMuoversiQui;
+
 public abstract class Entità
 {
     protected float x, y;
@@ -16,10 +19,12 @@ public abstract class Entità
     protected boolean inAria = false;
     protected int vitaMax;
     protected int vitaCorrente;
-    // Box attacco
     protected Rectangle2D.Float attackBox;
+    protected float velPg;
 
-    protected float velPg = 1.0f * Gioco.SCALA;
+    protected int direzioneContraccolpo;
+    protected float pushDrawOffset;
+    protected int contraccolpoDirOffset = SU;
 
     public Entità (float x, float y ,int larghezza, int altezza)
     {
@@ -27,6 +32,50 @@ public abstract class Entità
         this.y = y;
         this.larghezza = larghezza;
         this.altezza = altezza;
+    }
+
+    protected void updateContraccolpoDrawOffset ()
+    {
+        float vel = 0.95f;
+        float limite = -30f;
+
+        if (contraccolpoDirOffset == SU)
+        {
+            pushDrawOffset -= vel;
+
+            if (pushDrawOffset <= limite)
+            {
+                contraccolpoDirOffset = SOTTO;
+            }
+        }
+        else
+        {
+            pushDrawOffset += vel;
+
+            if (pushDrawOffset >= 0)
+            {
+                pushDrawOffset = 0;
+            }
+        }
+    }
+
+    public void contraccolpo (int direzioneContraccolpo, int [][] datiLvl, float velMulti)
+    {
+        float xVel = 0;
+
+        if (direzioneContraccolpo == SINISTRA)
+        {
+            xVel = -velPg;
+        }
+        else
+        {
+            xVel = velPg;
+        }
+
+        if (PuòMuoversiQui(hitbox.x + xVel * velMulti, hitbox.y, hitbox.width, hitbox.height, datiLvl))
+        {
+            hitbox.x += xVel * velMulti;
+        }
     }
 
     protected void drawHitBox (Graphics g, int xLvlOffset)
@@ -47,12 +96,6 @@ public abstract class Entità
         g.drawRect ((int) (attackBox.x - xLvlOffset), (int) (attackBox.y), (int) (attackBox.width), (int) (attackBox.height));
     }
 
-//    public void updateHitBox ()
-//    {
-//        hitBox.x = (int) x;
-//        hitBox.y = (int) y;
-//    }
-
     public Rectangle2D.Float getHitbox()
     {
         return hitbox;
@@ -66,5 +109,17 @@ public abstract class Entità
     public int getVitaCorrente ()
     {
         return vitaCorrente;
+    }
+
+    public int getStato ()
+    {
+        return stato;
+    }
+
+    public void nuovoStato (int stato)
+    {
+        this.stato = stato;
+        tickAni = 0;
+        indiceAni = 0;
     }
 }

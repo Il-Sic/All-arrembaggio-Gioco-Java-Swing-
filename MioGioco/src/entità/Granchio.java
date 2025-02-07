@@ -1,48 +1,33 @@
 package entità;
 
-import main.Gioco;
-
-import java.awt.*;
-import java.awt.geom.Rectangle2D;
+import statigioco.Playing;
 
 import static utilità.Costanti.CostantiNemico.*;
-import static utilità.Costanti.Direzioni.DESTRA;
+import static utilità.MetodiUtili.IsPavimento;
 
 public class Granchio extends Nemico
 {
-    private int xAttackBoxOffset;
-
     public Granchio (float x, float y)
     {
         super (x, y, LARGHEZZA_GRANCHIO, ALTEZZA_GRANCHIO, GRANCHIO);
         initHitBox (22 , 19);
-        initAttackBox ();
+        initAttackBox (82, 19, 30);
     }
 
-    private void initAttackBox ()
-    {
-        attackBox = new Rectangle2D.Float (x, y, (int) (82 * Gioco.SCALA), (int) (19 * Gioco.SCALA));
-        xAttackBoxOffset = (int) (30 * Gioco.SCALA);
-    }
 
-    public void update (int [][] datiLvl, Giocatore giocatore)
+
+    public void update (int [][] datiLvl, Playing playing)
     {
-        updateComportamento (datiLvl, giocatore);
+        updateComportamento (datiLvl, playing);
         updateTickAnimazione();
         updateAttackBox ();
     }
 
-    private void updateAttackBox ()
-    {
-        attackBox.x = hitbox.x - xAttackBoxOffset;
-        attackBox.y = hitbox.y;
-    }
-
-    public void updateComportamento (int [][] datiLvl, Giocatore giocatore)
+    public void updateComportamento (int [][] datiLvl, Playing playing)
     {
         if (primoUpdate)
         {
-            checkPrimoUpdate (datiLvl);
+            controlloPrimoUpdate(datiLvl);
         }
 
         if (inAria)
@@ -53,15 +38,25 @@ public class Granchio extends Nemico
         {
             switch (stato)
             {
-                case IDLE -> nuovoStato (CORSA);
+                case IDLE ->
+                {
+                    if (IsPavimento(hitbox, datiLvl))
+                    {
+                        nuovoStato (CORSA);
+                    }
+                    else
+                    {
+                        inAria = true;
+                    }
+                }
 
                 case CORSA ->
                 {
-                    if (puòVedereGiocatore(datiLvl, giocatore))
+                    if (puòVedereGiocatore(datiLvl, playing.getGiocatore()))
                     {
-                        giraVersoGiocatore(giocatore);
+                        giraVersoGiocatore(playing.getGiocatore());
 
-                        if (isGiocatoreNelRaggioPerAttacco(giocatore))
+                        if (isGiocatoreNelRangePerAttacco(playing.getGiocatore()))
                         {
                             nuovoStato(ATTACCO);
                         }
@@ -79,34 +74,20 @@ public class Granchio extends Nemico
 
                     if (indiceAni == 3 && !attaccoControllato)
                     {
-                        controllaColpoGiocatore (attackBox, giocatore);
+                        controllaColpoGiocatore (attackBox, playing.getGiocatore());
                     }
                 }
+
+                case COLPO ->
+                {
+                    if (indiceAni <= GetContSprite(tipoNemico, stato) - 2)
+                    {
+                        contraccolpo (direzioneContraccolpo, datiLvl, 2f);
+                    }
+
+                    updateContraccolpoDrawOffset ();
+                }
             }
-        }
-    }
-
-    public int xFlip ()
-    {
-        if (dirCamminata == DESTRA)
-        {
-            return larghezza;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-
-    public int lFlip ()
-    {
-        if (dirCamminata == DESTRA)
-        {
-            return -1;
-        }
-        else
-        {
-            return 1;
         }
     }
 }

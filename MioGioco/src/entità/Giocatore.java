@@ -9,28 +9,23 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
+import static utilità.Costanti.*;
 import static utilità.Costanti.CostantiGiocatore.*;
-import static utilità.Costanti.GRAVIOL;
-import static utilità.Costanti.VEL_ANI;
+import static utilità.Costanti.Direzioni.*;
 import static utilità.MetodiUtili.*;
 
 public class Giocatore extends Entità
 {
-    private BufferedImage[][] animazioni;                                       // non le carico perchè le utlizzo solo temporaneamente
+    private BufferedImage[][] animazioni;
     private boolean movimento = false, attacco = false;
     private boolean sinistra, destra, salto;
     private int [][] datiLvl;
     private float xDrawOffset = 21 * Gioco.SCALA;
     private float yDrawOffset = 4 * Gioco.SCALA;
 
-    // SALTO e GRAVITÀ
-//    private float velAria = 0f;
-//    private float gravità = 0.04f * Gioco.SCALA;
-    private float velSalto = -2.25f * Gioco.SCALA;                              // negativo perchè si sposta sulle y e quindi in altezza
-    private float velCadutaDopoCollisione =  0.5f * Gioco.SCALA;                // quando ad esempio si colpisce il tetto
-    private boolean inAria = false;
+    private float velSalto = -2.25f * Gioco.SCALA;
+    private float velCadutaDopoCollisione =  0.5f * Gioco.SCALA;
 
-    // Barra di stato
     private BufferedImage barraStatoImg;
 
     private int larghezzaBarraStato = (int) (192 * Gioco.SCALA);
@@ -72,7 +67,6 @@ public class Giocatore extends Entità
         this.stato = IDLE;
         this.vitaMax = 100;
         this.vitaCorrente = vitaMax;
-        this.vitaCorrente = 35;
         this.velPg = 1.0f * Gioco.SCALA;
 
         caricaAnimazioni ();
@@ -101,6 +95,12 @@ public class Giocatore extends Entità
                 indiceAni = 0;
                 playing.setMorteGiocatore (true);
                 playing.getGioco().getLettoreAudio().riproduciEffetto(LettoreAudio.MUORI);
+
+                if (!IsEntitàSulPavimento(hitbox, datiLvl))
+                {
+                    inAria = true;
+                    velAria = 0;
+                }
             }
             else if (indiceAni == GetSpriteCont (MORTE) - 1 && tickAni >= VEL_ANI - 1)
             {
@@ -111,6 +111,19 @@ public class Giocatore extends Entità
             else
             {
                 updateTickAnimazioni();
+
+                if (inAria)
+                {
+                    if (PuòMuoversiQui(hitbox.x, hitbox.y + velAria, hitbox.width, hitbox.height, datiLvl))
+                    {
+                        hitbox.y += velAria;
+                        velAria += GRAVIOL;
+                    }
+                    else
+                    {
+                        inAria = false;
+                    }
+                }
             }
 
             return;
@@ -118,12 +131,25 @@ public class Giocatore extends Entità
 
         updateAttackBox ();
 
-        updatePos ();
+        if (stato == COLPO)
+        {
+            if (indiceAni <= GetDannoNemico(stato) - 3)
+            {
+                contraccolpo(direzioneContraccolpo, datiLvl, 1.25f);
+            }
+
+            updateContraccolpoDrawOffset();
+        }
+        else
+        {
+            updatePos();
+        }
 
         if (movimento)
         {
             controllaPozioneToccata ();
             controllaSpuntoniToccati ();
+            controllaInAcqua();
 
             casellaY = (int) (hitbox.y / Gioco.DIMENSIONE_CASELLA);
 
@@ -146,6 +172,14 @@ public class Giocatore extends Entità
 
         updateTickAnimazioni ();
         setAnimazione ();
+    }
+
+    private void controllaInAcqua()
+    {
+        if (IsEntitàInAcqua (hitbox, playing.getGestioneLivello().getLivelloCorrente().getDatiLvl()))
+        {
+            vitaCorrente = 0;
+        }
     }
 
     private void updateBarraForza()
@@ -201,21 +235,21 @@ public class Giocatore extends Entità
         {
             if (lFlip == 1)
             {
-                attackBox.x = hitbox.x + hitbox.width + (int) (Gioco.SCALA * 10);
+                setAttackBoxLatoDestro();
             }
             else
             {
-                attackBox.x = hitbox.x - hitbox.width - (int) (Gioco.SCALA * 10);
+                setAttackBoxLatoSinistro();
             }
         }
 
         else if (destra || forzaAttaccoAttiva && lFlip == 1)
         {
-            attackBox.x = hitbox.x + hitbox.width + (int) (Gioco.SCALA * 10);
+            setAttackBoxLatoDestro();
         }
         else if (sinistra || forzaAttaccoAttiva && lFlip == -1)
         {
-            attackBox.x = hitbox.x - hitbox.width - (int) (Gioco.SCALA * 10);
+            setAttackBoxLatoSinistro();
         }
 
         attackBox.y = hitbox.y + (Gioco.SCALA * 10);
@@ -228,15 +262,41 @@ public class Giocatore extends Entità
 
     public void cambiaVita (int valore)
     {
-        vitaCorrente += valore;
-
-        if (vitaCorrente <= 0)
+        if (valore < 0)
         {
-            vitaCorrente = 0;
+            if (stato == COLPO)
+            {
+                return;
+            }
+            else
+            {
+                nuovoStato(COLPO);
+            }
         }
-        else if (vitaCorrente >= vitaMax)
+
+        vitaCorrente += valore;
+        vitaCorrente = Math.max (Math.min (vitaCorrente, vitaMax), 0);
+    }
+
+    public void cambiaVita (int valore, Nemico nemico)
+    {
+        if (stato == COLPO)
         {
-            vitaCorrente = vitaMax;
+            return;
+        }
+
+        cambiaVita(valore);
+
+        contraccolpoDirOffset = SU;
+        pushDrawOffset = 0;
+
+        if (nemico.getHitbox().x < hitbox.x)
+        {
+            direzioneContraccolpo = DESTRA;
+        }
+        else
+        {
+            direzioneContraccolpo = SINISTRA;
         }
     }
 
@@ -310,6 +370,17 @@ public class Giocatore extends Entità
                 indiceAni = 0;
                 attacco = false;
                 attaccoControllato = false;
+
+                if (stato == COLPO)
+                {
+                    nuovoStato(IDLE);
+                    velAria = 0f;
+
+                    if (!IsPavimento(hitbox, 0, datiLvl))
+                    {
+                        inAria = true;
+                    }
+                }
             }
         }
     }
@@ -317,6 +388,11 @@ public class Giocatore extends Entità
     private void setAnimazione()
     {
         int iniziaAni = stato;
+
+        if (stato == COLPO)
+        {
+            return;
+        }
 
         if (movimento)
         {
@@ -440,7 +516,7 @@ public class Giocatore extends Entità
 
         if (!inAria)
         {
-            if (!isEntitàSulPavimento(hitbox, datiLvl))
+            if (!IsEntitàSulPavimento(hitbox, datiLvl))
             {
                 inAria = true;
             }
@@ -448,7 +524,7 @@ public class Giocatore extends Entità
 
         if (inAria && !forzaAttaccoAttiva)
         {
-            if (puòMuoversiQui(hitbox.x, hitbox.y + velAria, hitbox.width, hitbox.height, datiLvl))
+            if (PuòMuoversiQui(hitbox.x, hitbox.y + velAria, hitbox.width, hitbox.height, datiLvl))
             {
                 hitbox.y += velAria;
                 velAria += GRAVIOL;
@@ -456,7 +532,7 @@ public class Giocatore extends Entità
             }
             else
             {
-                hitbox.y = getPosizioneEntitàVicinoAlMuroY(hitbox, velAria);
+                hitbox.y = GetPosizioneEntitàVicinoAlMuroY(hitbox, velAria);
 
                 if (velAria > 0)
                 {
@@ -498,13 +574,13 @@ public class Giocatore extends Entità
 
     private void updatePosX (float velX)
     {
-        if (puòMuoversiQui(hitbox.x + velX, hitbox.y, hitbox.width, hitbox.height, datiLvl))
+        if (PuòMuoversiQui(hitbox.x + velX, hitbox.y, hitbox.width, hitbox.height, datiLvl))
         {
             hitbox.x += velX;
         }
         else
         {
-            hitbox.x = getPosizioneEntitàVicinoAlMuroX (hitbox, velX);
+            hitbox.x = GetPosizioneEntitàVicinoAlMuroX(hitbox, velX);
 
             if (forzaAttaccoAttiva)
             {
@@ -536,7 +612,7 @@ public class Giocatore extends Entità
     {
         this.datiLvl = datiLvl;
 
-        if (!isEntitàSulPavimento(hitbox, datiLvl))
+        if (!IsEntitàSulPavimento(hitbox, datiLvl))
         {
             inAria = true;
         }
@@ -584,6 +660,17 @@ public class Giocatore extends Entità
         this.salto = salto;
     }
 
+    private void setAttackBoxLatoDestro()
+    {
+        attackBox.x = hitbox.x + hitbox.width - (int) (Gioco.SCALA * 5);
+    }
+
+    private void setAttackBoxLatoSinistro()
+    {
+        attackBox.x = hitbox.x - hitbox.width - (int) (Gioco.SCALA * 10);
+    }
+
+
     public void resettaTutto()
     {
         resetDirBooleans();
@@ -598,7 +685,7 @@ public class Giocatore extends Entità
         hitbox.y = y;
         resetAttackBox ();
 
-        if (!isEntitàSulPavimento(hitbox, datiLvl))
+        if (!IsEntitàSulPavimento(hitbox, datiLvl))
         {
             inAria = true;
         }

@@ -1,6 +1,7 @@
 package entità;
 
 import main.Gioco;
+import statigioco.Playing;
 
 import java.awt.geom.Rectangle2D;
 
@@ -18,6 +19,7 @@ public class Nemico extends Entità
     protected float distanzaAttacco = Gioco.DIMENSIONE_CASELLA;
     protected boolean attivo = true;
     protected boolean attaccoControllato;
+    protected int attackBoxOffsetX;
 
 
     public Nemico (float x, float y, int larghezza, int altezza, int tipoNemico)
@@ -27,8 +29,35 @@ public class Nemico extends Entità
 
         vitaMax = GetVitaMax (tipoNemico);
         vitaCorrente = vitaMax;
-        this.velPg = 0.5f * Gioco.SCALA;
+        this.velPg = 0.30f * Gioco.SCALA;
     }
+
+    protected void updateAttackBox ()
+    {
+        attackBox.x = hitbox.x -attackBoxOffsetX;
+        attackBox.y = hitbox.y;
+    }
+
+    protected void updateAttackBoxFlip()
+    {
+        if (dirCamminata == DESTRA)
+        {
+            attackBox.x = hitbox.x + hitbox.width;
+        }
+        else
+        {
+            attackBox.x = hitbox.x - attackBoxOffsetX;
+        }
+
+        attackBox.y = hitbox.y;
+    }
+
+    protected void initAttackBox(int w, int h, int attackBoxOffsetX)
+    {
+        attackBox = new Rectangle2D.Float (x, y, (int) (w * Gioco.SCALA), (int) (h * Gioco.SCALA));
+        this.attackBoxOffsetX = (int) (Gioco.SCALA * attackBoxOffsetX);
+    }
+
 
     protected void updateTickAnimazione()
     {
@@ -41,39 +70,49 @@ public class Nemico extends Entità
 
             if (indiceAni >= GetContSprite(tipoNemico, stato))
             {
-                indiceAni = 0;
-
-                switch (stato)
+                if (tipoNemico == GRANCHIO || tipoNemico == SQUALO)
                 {
-                    case ATTACCO, COLPO ->
+                    indiceAni = 0;
+
+                    switch (stato)
                     {
-                        stato = IDLE;
-                    }
-                    case MORTE ->
-                    {
-                        attivo = false;
+                        case ATTACCO, COLPO ->
+                        {
+                            stato = IDLE;
+                        }
+                        case MORTE ->
+                        {
+                            attivo = false;
+                        }
                     }
                 }
+                else if (tipoNemico == STELLA)
+                {
+                    if (stato == ATTACCO)
+                    {
+                        indiceAni  = 3;
+                    }
+                    else
+                    {
+                        indiceAni = 0;
 
-//                if (statoNemico == ATTACCO)
-//                {
-//                    statoNemico = IDLE;
-//                }
-//                else if (statoNemico == COLPO)
-//                {
-//                    statoNemico = IDLE;
-//                }
-//                else if (statoNemico == MORTE)
-//                {
-//                    attivo = false;
-//                }
+                        if (stato == COLPO)
+                        {
+                            stato = IDLE;
+                        }
+                        else if (stato == MORTE)
+                        {
+                            attivo = false;
+                        }
+                    }
+                }
             }
         }
     }
 
-    protected void checkPrimoUpdate(int[][] datiLvl)
+    protected void controlloPrimoUpdate (int[][] datiLvl)
     {
-        if (!isEntitàSulPavimento(hitbox, datiLvl))
+        if (!IsEntitàSulPavimento(hitbox, datiLvl))
         {
             inAria = true;
         }
@@ -81,9 +120,23 @@ public class Nemico extends Entità
         primoUpdate = false;
     }
 
+    protected void controlloInAria (int [][] datiLvl, Playing playing)
+    {
+        if (stato != COLPO && stato != MORTE)
+        {
+            updateInAria (datiLvl);
+            playing.getGestoreOggetto().controllaSpuntoniToccati (playing.getGiocatore());
+
+            if (IsEntitàInAcqua (hitbox, datiLvl))
+            {
+                ferisci (vitaMax);
+            }
+        }
+    }
+
     protected void updateInAria(int[][] datiLvl)
     {
-        if (puòMuoversiQui(hitbox.x, hitbox.y + velAria, hitbox.width, hitbox.height, datiLvl))
+        if (PuòMuoversiQui(hitbox.x, hitbox.y + velAria, hitbox.width, hitbox.height, datiLvl))
         {
             hitbox.y += velAria;
             velAria += GRAVIOL;
@@ -91,7 +144,7 @@ public class Nemico extends Entità
         else
         {
             inAria = false;
-            hitbox.y = getPosizioneEntitàVicinoAlMuroY(hitbox, velAria);
+            hitbox.y = GetPosizioneEntitàVicinoAlMuroY(hitbox, velAria);
             casellaY = (int) (hitbox.y / Gioco.DIMENSIONE_CASELLA);
         }
     }
@@ -109,9 +162,9 @@ public class Nemico extends Entità
             velX = velPg;
         }
 
-        if (puòMuoversiQui(hitbox.x + velX, hitbox.y, hitbox.width, hitbox.height, datiLvl))
+        if (PuòMuoversiQui(hitbox.x + velX, hitbox.y, hitbox.width, hitbox.height, datiLvl))
         {
-            if (isPavimento(hitbox, velX, datiLvl))
+            if (IsPavimento(hitbox, velX, datiLvl))
             {
                 hitbox.x += velX;
 
@@ -120,6 +173,18 @@ public class Nemico extends Entità
         }
 
         cambiaDirCamminata();
+    }
+
+    protected void giratiVersoGiocatore (Giocatore giocatore)
+    {
+        if (giocatore.hitbox.x > hitbox.x)
+        {
+            dirCamminata = DESTRA;
+        }
+        else
+        {
+            dirCamminata = SINISTRA;
+        }
     }
 
     protected void cambiaDirCamminata()
@@ -134,7 +199,7 @@ public class Nemico extends Entità
         }
     }
 
-    protected void nuovoStato (int statoNemico)
+    public void nuovoStato(int statoNemico)
     {
         this.stato = statoNemico;
 
@@ -153,6 +218,17 @@ public class Nemico extends Entità
         else
         {
             nuovoStato (COLPO);
+
+            if (dirCamminata == SINISTRA)
+            {
+                direzioneContraccolpo = DESTRA;
+            }
+            else
+            {
+                direzioneContraccolpo = SINISTRA;
+                contraccolpoDirOffset = SU;
+                pushDrawOffset = 0;
+            }
         }
     }
 
@@ -161,6 +237,13 @@ public class Nemico extends Entità
         if (attackBox.intersects (giocatore.hitbox))
         {
             giocatore.cambiaVita (-GetDannoNemico (tipoNemico));
+        }
+        else
+        {
+            if (tipoNemico == SQUALO)
+            {
+                return;
+            }
         }
 
         attaccoControllato = true;
@@ -172,9 +255,9 @@ public class Nemico extends Entità
 
         if (casellaGiocatoreY == casellaY)
         {
-            if (isGiocatoreNelRaggio(giocatore))
+            if (isGiocatoreNelRange(giocatore))
             {
-                return isVistaChiara (datiLvl, hitbox, giocatore.hitbox, casellaY);
+                return IsVistaChiara(datiLvl, hitbox, giocatore.hitbox, casellaY);
             }
         }
 
@@ -193,18 +276,34 @@ public class Nemico extends Entità
         }
     }
 
-    protected boolean isGiocatoreNelRaggio (Giocatore giocatore)
+    protected boolean isGiocatoreNelRange (Giocatore giocatore)
     {
         int valoreAssoluto = (int) Math.abs (giocatore.hitbox.x - hitbox.x);
 
         return valoreAssoluto <= distanzaAttacco * 5;
     }
 
-    protected boolean isGiocatoreNelRaggioPerAttacco(Giocatore giocatore)
+    protected boolean isGiocatoreNelRangePerAttacco (Giocatore giocatore)
     {
         int valoreAssoluto = (int) Math.abs (giocatore.hitbox.x - hitbox.x);
 
-        return valoreAssoluto <= distanzaAttacco;
+        switch (tipoNemico)
+        {
+            case GRANCHIO ->
+            {
+                return valoreAssoluto <= distanzaAttacco;
+            }
+
+            case SQUALO ->
+            {
+                return valoreAssoluto <= distanzaAttacco * 2;
+            }
+
+            default ->
+            {
+                return false;
+            }
+        }
     }
 
     public int getStatoNemico()
@@ -226,5 +325,35 @@ public class Nemico extends Entità
         nuovoStato (IDLE);
         attivo = true;
         velAria = 0;
+        pushDrawOffset = 0;
+    }
+
+    public int xFlip()
+    {
+        if (dirCamminata == DESTRA)
+        {
+            return larghezza;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    public int lFlip()
+    {
+        if (dirCamminata == DESTRA)
+        {
+            return -1;
+        }
+        else
+        {
+            return 1;
+        }
+    }
+
+    public float getPushDrawOffset()
+    {
+        return pushDrawOffset;
     }
 }

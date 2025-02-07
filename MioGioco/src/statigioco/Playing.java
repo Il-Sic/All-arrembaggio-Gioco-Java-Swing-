@@ -1,11 +1,14 @@
 package statigioco;
 
+import effetti.EffettoDialogo;
+import effetti.Pioggia;
 import entità.GestioneNemico;
 import entità.Giocatore;
 import livelli.GestioneLivello;
 import main.Gioco;
 import oggetti.GestoreOggetto;
 import ui.OverlayGameOver;
+import ui.OverlayGiocoCompletato;
 import ui.OverlayLivelloCompletato;
 import ui.OverlayPausa;
 import utilità.CaricaSalva;
@@ -17,9 +20,11 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Random;
 
 import static utilità.Costanti.Ambiente.*;
+import static utilità.Costanti.Dialogo.*;
 
 public class Playing extends Stato implements StatoMetodi
 {
@@ -30,20 +35,31 @@ public class Playing extends Stato implements StatoMetodi
     private OverlayPausa overlayPausa;
     private OverlayGameOver overlayGameOver;
     private OverlayLivelloCompletato overlayLivelloCompletato;
+    private OverlayGiocoCompletato overlayGiocoCompletato;
+    private Pioggia pioggia;
     private boolean inPausa = false;
 
     private int xLvlOffset;
-    private int bordoSin = (int) (0.2 * Gioco.LARGHEZZA_GIOCO);
-    private int bordoDes = (int) (0.8 * Gioco.LARGHEZZA_GIOCO);
+    private int bordoSin = (int) (0.25 * Gioco.LARGHEZZA_GIOCO);
+    private int bordoDes = (int) (0.75 * Gioco.LARGHEZZA_GIOCO);
     private int maxXLvlOffset;
 
     private BufferedImage immagineBackgound, grandeNuvola, piccolaNuvola;
+    private BufferedImage [] imgsDomanda, imgsEsclamazione, imgsBarca;
+    private ArrayList <EffettoDialogo> effettiDialogo = new ArrayList<>();
+
     private int [] posizionePiccolaNuvola;
     private Random rand = new Random();
 
     private boolean gameOver = false;
     private boolean lvlCompletato = false;
     private boolean morteGiocatore = false;
+    private boolean giocoCompletato = false;
+    private boolean drawPioggia = false;
+
+    private boolean drawBarca = true;
+    private int aniBarca, tickBarca, dirBarca = 1;
+    private float deltaAltezzaBarca, cambiaAltezzaBarca = 0.05f * Gioco.SCALA;
 
     public Playing (Gioco gioco) throws URISyntaxException, IOException
     {
@@ -53,22 +69,77 @@ public class Playing extends Stato implements StatoMetodi
         immagineBackgound = CaricaSalva.GetAtltanteSprite(CaricaSalva.BACKGROUND_IN_GIOCO);
         grandeNuvola = CaricaSalva.GetAtltanteSprite(CaricaSalva.GRANDI_NUVOLE);
         piccolaNuvola = CaricaSalva.GetAtltanteSprite(CaricaSalva.PICCOLE_NUVOLE);
-
         posizionePiccolaNuvola = new int [8];
+
         for (int i = 0; i < posizionePiccolaNuvola.length; i++)
         {
             posizionePiccolaNuvola [i] = (int) (90 * Gioco.SCALA) + rand.nextInt ((int) (100 * Gioco.SCALA));
         }
 
+        imgsBarca = new BufferedImage [4];
+        BufferedImage temp = CaricaSalva.GetAtltanteSprite (CaricaSalva.BARCA);
+
+        for (int i = 0; i < imgsBarca.length; i++)
+        {
+            imgsBarca [i] = temp.getSubimage(i * 78, 0, 78, 72);
+        }
+
+        caricaDialogo ();
         calcolaLvlOffset ();
         caricaInizioLivello ();
+        setDrawPioggiaBoolean ();
+    }
+
+    private void caricaDialogo()
+    {
+        caricaImgsDialogo ();
+
+        // Load dialogue array with premade objects, that gets activated when needed.
+        // This is a simple
+        // way of avoiding ConcurrentModificationException error. (Adding to a list that
+        // is being looped through.
+
+        for (int i = 0; i < 10; i++)
+        {
+            effettiDialogo.add(new EffettoDialogo(0, 0, ESCLAMAZIONE));
+        }
+        for (int i = 0; i < 10; i++)
+        {
+            effettiDialogo.add(new EffettoDialogo(0, 0, DOMANDA));
+        }
+
+        for (EffettoDialogo effettoDialogo : effettiDialogo)
+        {
+            effettoDialogo.disattiva();
+        }
+    }
+
+    private void caricaImgsDialogo()
+    {
+        BufferedImage temp = CaricaSalva.GetAtltanteSprite(CaricaSalva.ATLANTE_DOMANDA);
+        imgsDomanda = new BufferedImage[5];
+
+        for (int i = 0; i < imgsDomanda.length; i++)
+        {
+            imgsDomanda[i] = temp.getSubimage(i * 14, 0, 14, 12);
+        }
+
+        temp = (CaricaSalva.GetAtltanteSprite(CaricaSalva.ATLANTE_ESCLAMAZIONE));
+        imgsEsclamazione = new BufferedImage[5];
+
+        for (int i = 0; i < imgsEsclamazione.length; i++)
+        {
+            imgsEsclamazione[i] = temp.getSubimage(i * 14, 0, 14, 12);
+        }
     }
 
     public void caricaLivelloSuccessivo ()
     {
+        gestioneLivello.setIndiceLivello (gestioneLivello.getIndiceLivello() + 1);
         gestioneLivello.caricaLivelloSuccessivo ();
         giocatore.setSpawn (gestioneLivello.getLivelloCorrente ().getSpawnGiocatore ());
         resettaTutto ();
+        drawBarca = false;
     }
 
     private void caricaInizioLivello()
@@ -86,6 +157,7 @@ public class Playing extends Stato implements StatoMetodi
     {
         gestioneLivello = new GestioneLivello (gioco);
         gestioneNemico = new GestioneNemico (this);
+        gestoreOggetto = new GestoreOggetto (this);
 
         giocatore = new Giocatore (200, 200, (int) (64 * Gioco.SCALA), (int) (40 * Gioco.SCALA), this);
         giocatore.caricaDatiLvl (gestioneLivello.getLivelloCorrente ().getDatiLvl ());
@@ -94,8 +166,9 @@ public class Playing extends Stato implements StatoMetodi
         overlayPausa = new OverlayPausa (this);
         overlayGameOver = new OverlayGameOver (this);
         overlayLivelloCompletato = new OverlayLivelloCompletato (this);
+        overlayGiocoCompletato = new OverlayGiocoCompletato (this);
 
-        gestoreOggetto = new GestoreOggetto (this);
+        pioggia = new Pioggia();
     }
 
     public void windowFocusLost ()
@@ -132,13 +205,103 @@ public class Playing extends Stato implements StatoMetodi
         {
             giocatore.update();
         }
+        else if (giocoCompletato)
+        {
+            overlayGiocoCompletato.update ();
+        }
         else
         {
+            updateDialogo ();
+
+            if (drawPioggia)
+            {
+                pioggia.update(xLvlOffset);
+            }
+
             gestioneLivello.update();
             gestoreOggetto.update(gestioneLivello.getLivelloCorrente().getDatiLvl(), giocatore);
             giocatore.update();
             gestioneNemico.update(gestioneLivello.getLivelloCorrente().getDatiLvl(), giocatore);
             controllaVicinoBordo();
+
+            if (drawBarca)
+            {
+                updateAniBarca ();
+            }
+        }
+    }
+
+    private void updateAniBarca()
+    {
+        tickBarca ++;
+
+        if (tickBarca >= 35)
+        {
+            tickBarca = 0;
+            aniBarca ++;
+
+            if (aniBarca >= 4)
+            {
+                aniBarca = 0;
+            }
+        }
+
+        deltaAltezzaBarca += cambiaAltezzaBarca * dirBarca;
+        deltaAltezzaBarca = Math.max(Math.min(10 * Gioco.SCALA, deltaAltezzaBarca), 0);
+
+        if (deltaAltezzaBarca == 0)
+        {
+            dirBarca = 1;
+        }
+        else if (deltaAltezzaBarca == 10 * Gioco.SCALA)
+        {
+            dirBarca = -1;
+        }
+    }
+
+    private void updateDialogo()
+    {
+        for (EffettoDialogo effettoDialogo : effettiDialogo)
+        {
+            if (effettoDialogo.isAttivo())
+            {
+                effettoDialogo.update();
+            }
+        }
+    }
+
+    private void drawDialogo (Graphics g, int xLvlOffset)
+    {
+        for (EffettoDialogo effettoDialogo : effettiDialogo)
+        {
+            if (effettoDialogo.isAttivo())
+            {
+                if (effettoDialogo.getTipo() == DOMANDA)
+                {
+                    g.drawImage(imgsDomanda[effettoDialogo.getIndiceAni()], effettoDialogo.getX() - xLvlOffset, effettoDialogo.getY(), LARGHEZZA_DIALOGO, ALTEZZA_DIALOGO, null);
+                }
+                else
+                {
+                    g.drawImage(imgsEsclamazione[effettoDialogo.getIndiceAni()], effettoDialogo.getX() - xLvlOffset, effettoDialogo.getY(), LARGHEZZA_DIALOGO, ALTEZZA_DIALOGO, null);
+                }
+            }
+        }
+    }
+
+    public void aggiungiDialogo(int x, int y, int tipo)
+    {
+        effettiDialogo.add(new EffettoDialogo(x, y - (int) (Gioco.SCALA * 15), tipo));
+
+        for (EffettoDialogo effettoDialogo : effettiDialogo)
+        {
+            if (!effettoDialogo.isAttivo())
+            {
+                if (effettoDialogo.getTipo() == tipo)
+                {
+                    effettoDialogo.resetta(x, -(int) (Gioco.SCALA * 15));
+                    return;
+                }
+            }
         }
     }
 
@@ -186,10 +349,23 @@ public class Playing extends Stato implements StatoMetodi
 
         drawNuvole(g);
 
+        if (drawPioggia)
+        {
+            pioggia.draw(g, xLvlOffset);
+        }
+
+        if (drawBarca)
+        {
+            g.drawImage (imgsBarca[aniBarca], (int) (100 * Gioco.SCALA) - xLvlOffset, (int) ((288 * Gioco.SCALA) + deltaAltezzaBarca), (int) (78 * Gioco.SCALA), (int) (72 * Gioco.SCALA), null);
+
+        }
+
         gestioneLivello.draw(g, xLvlOffset);
         giocatore.render(g, xLvlOffset);
         gestioneNemico.draw(g, xLvlOffset);
         gestoreOggetto.draw(g, xLvlOffset);
+        gestoreOggetto.drawAlberiBackground (g, xLvlOffset);
+        drawDialogo (g, xLvlOffset);
 
         if (inPausa)
         {
@@ -204,6 +380,10 @@ public class Playing extends Stato implements StatoMetodi
         else if (lvlCompletato)
         {
             overlayLivelloCompletato.draw (g);
+        }
+        else if (giocoCompletato)
+        {
+            overlayGiocoCompletato.draw (g);
         }
     }
 
@@ -226,79 +406,81 @@ public class Playing extends Stato implements StatoMetodi
     @Override
     public void mousePressed (MouseEvent e)
     {
-        if (!gameOver)
+        if (gameOver)
         {
-            if (inPausa)
-            {
-                overlayPausa.mousePressed (e);
-            }
-            else if (lvlCompletato)
-            {
-                overlayLivelloCompletato.mousePressed(e);
-            }
+            overlayGameOver.mousePressed(e);
         }
-        else
+        else if (inPausa)
         {
-            overlayGameOver.mousePressed (e);
+            overlayPausa.mousePressed(e);
+        }
+        else if (lvlCompletato)
+        {
+            overlayLivelloCompletato.mousePressed(e);
+        }
+        else if (giocoCompletato)
+        {
+            overlayGiocoCompletato.mousePressed(e);
         }
     }
 
     @Override
     public void mouseReleased (MouseEvent e)
     {
-        if (!gameOver)
+        if (gameOver)
         {
-            if (inPausa)
-            {
-                overlayPausa.mouseReleased (e);
-            }
-            else if (lvlCompletato)
-            {
-                overlayLivelloCompletato.mouseReleased (e);
-            }
+            overlayGameOver.mouseReleased(e);
         }
-        else
+        else if (inPausa)
         {
-            overlayGameOver.mouseReleased (e);
+            overlayPausa.mouseReleased(e);
+        }
+        else if (lvlCompletato)
+        {
+            overlayLivelloCompletato.mouseReleased(e);
+        }
+        else if (giocoCompletato)
+        {
+            overlayGiocoCompletato.mouseReleased(e);
         }
     }
 
     @Override
     public void mouseMoved (MouseEvent e)
     {
-        if (!gameOver)
+        if (gameOver)
         {
-            if (inPausa)
-            {
-                overlayPausa.mouseMoved (e);
-            }
-            else if (lvlCompletato)
-            {
-                overlayLivelloCompletato.mouseMoved (e);
-            }
+            overlayGameOver.mouseMoved(e);
         }
-        else
+        else if (inPausa)
         {
-            overlayGameOver.mouseMoved (e);
+            overlayPausa.mouseMoved(e);
+        }
+        else if (lvlCompletato)
+        {
+            overlayLivelloCompletato.mouseMoved(e);
+        }
+        else if (giocoCompletato)
+        {
+            overlayGiocoCompletato.mouseMoved(e);
         }
     }
 
     public void mouseDragged (MouseEvent e)
     {
-        if (inPausa)
+        if (!gameOver && !lvlCompletato && !giocoCompletato)
         {
-            overlayPausa.mouseDragged (e);
+            if (inPausa)
+            {
+                overlayPausa.mouseDragged(e);
+            }
         }
     }
 
     @Override
     public void keyPressed (KeyEvent e)
     {
-        if (gameOver)
-        {
-            overlayGameOver.keyPressed (e);
-        }
-        else
+        if (!gameOver && !lvlCompletato && !giocoCompletato)
         {
             switch (e.getKeyCode())
             {
@@ -329,30 +511,19 @@ public class Playing extends Stato implements StatoMetodi
     @Override
     public void keyReleased(KeyEvent e)
     {
-        if (!gameOver)
+        if (!gameOver && !lvlCompletato && !giocoCompletato)
         {
             switch (e.getKeyCode())
             {
-                //            case KeyEvent.VK_W ->
-                //            {
-                //                giocatore.setSopra (false);
-                //            }
-
                 case KeyEvent.VK_A ->
                 {
                     giocatore.setSinistra (false);
                 }
 
-                //            case KeyEvent.VK_S ->
-                //            {
-                //                giocatore.setSotto (false);
-                //            }
-
                 case KeyEvent.VK_D ->
                 {
                     giocatore.setDestra (false);
                 }
-
 
                 case KeyEvent.VK_SPACE ->
                 {
@@ -368,9 +539,21 @@ public class Playing extends Stato implements StatoMetodi
         inPausa = false;
         lvlCompletato = false;
         morteGiocatore = false;
+
+        setDrawPioggiaBoolean ();
+
         giocatore.resettaTutto ();
         gestioneNemico.resettaTuttoNemici ();
         gestoreOggetto.resettaTuttiOggetti();
+        effettiDialogo.clear();
+    }
+
+    private void setDrawPioggiaBoolean()
+    {
+        if (rand.nextFloat() >= 0.8f)
+        {
+            drawPioggia = true;
+        }
     }
 
     public void controllaColpoNemico (Rectangle2D.Float attackBox)
@@ -391,6 +574,16 @@ public class Playing extends Stato implements StatoMetodi
     public void controllaSpuntoniToccati (Giocatore giocatore)
     {
         gestoreOggetto.controllaSpuntoniToccati (giocatore);
+    }
+
+    public void resettaGiocoCompletato ()
+    {
+        giocoCompletato = false;
+    }
+
+    public void setGiocoCompletato ()
+    {
+        giocoCompletato = true;
     }
 
     public void setGameOver (boolean gameOver)
@@ -420,12 +613,16 @@ public class Playing extends Stato implements StatoMetodi
 
     public void setLivelloCompletato (boolean livelloCompletato)
     {
-        this.lvlCompletato = livelloCompletato;
-
-        if (livelloCompletato)
+        gioco.getLettoreAudio().livelloCompletato();
+        if (gestioneLivello.getIndiceLivello() + 1 >= gestioneLivello.getNumeroLivelli())
         {
-            gioco.getLettoreAudio().livelloCompletato();
+            giocoCompletato = true;
+            gestioneLivello.setIndiceLivello (0);
+            gestioneLivello.caricaLivelloSuccessivo();
+            resettaTutto();
+            return;
         }
+        this.lvlCompletato = livelloCompletato;
     }
 
     public void setMorteGiocatore (boolean morteGiocatore)

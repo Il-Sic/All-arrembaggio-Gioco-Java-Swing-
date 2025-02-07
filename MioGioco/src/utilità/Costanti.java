@@ -2,7 +2,7 @@ package utilità;
 
 import main.Gioco;
 
-import static utilità.Costanti.CostantiNemico.GRANCHIO;
+import static utilità.Costanti.CostantiNemico.*;
 
 public class Costanti
 {
@@ -12,6 +12,8 @@ public class Costanti
     public static class CostantiNemico
     {
         public static final int GRANCHIO = 0;
+        public static final int STELLA = 1;
+        public static final int SQUALO = 2;
 
         public static final int IDLE = 0;
         public static final int CORSA = 1;
@@ -21,38 +23,65 @@ public class Costanti
 
         public static final int LARGHEZZA_GRANCHIO_DEFAULT = 72;
         public static final int ALTEZZA_GRANCHIO_DEFAULT = 32;
-
         public static final int ALTEZZA_GRANCHIO = (int) (ALTEZZA_GRANCHIO_DEFAULT * Gioco.SCALA);
         public static final int LARGHEZZA_GRANCHIO = (int) (LARGHEZZA_GRANCHIO_DEFAULT * Gioco.SCALA);
-
         public static final int GRANCHIO_DRAWOFFSET_X = (int) (26 * Gioco.SCALA);
         public static final int GRANCHIO_DRAWOFFSET_Y = (int) (9 * Gioco.SCALA);
 
+        public static final int LARGHEZZA_STELLA_DEFAULT = 34;
+        public static final int ALTEZZA_STELLA_DEFAULT = 30;
+        public static final int LARGHEZZA_STELLA = (int) (LARGHEZZA_STELLA_DEFAULT * Gioco.SCALA);
+        public static final int ALTEZZA_STELLA = (int) (ALTEZZA_STELLA_DEFAULT * Gioco.SCALA);
+        public static final int STELLA_DRAWOFFSET_X = (int) (9 * Gioco.SCALA);
+        public static final int STELLA_DRAWOFFSET_Y = (int) (7 * Gioco.SCALA);
+
+        public static final int LARGHEZZA_SQUALO_DEFAULT = 34;
+        public static final int ALTEZZA_SQUALO_DEFAULT = 30;
+        public static final int LARGHEZZA_SQUALO = (int) (LARGHEZZA_SQUALO_DEFAULT * Gioco.SCALA);
+        public static final int ALTEZZA_SQUALO = (int) (ALTEZZA_SQUALO_DEFAULT * Gioco.SCALA);
+        public static final int SQUALO_DRAWOFFSET_X = (int) (8 * Gioco.SCALA);
+        public static final int SQUALO_DRAWOFFSET_Y = (int) (6 * Gioco.SCALA);
+
+
         public static int GetContSprite (int tipoNemico, int statoNemico)
         {
-            return switch (tipoNemico)
-            {
-                case GRANCHIO -> switch (statoNemico)
+            switch (statoNemico) {
+
+                case IDLE ->
                 {
-                    case IDLE -> 9;
+                    if (tipoNemico == GRANCHIO)
+                    {
+                        return 9;
+                    }
+                    else if (tipoNemico == STELLA || tipoNemico == SQUALO)
+                    {
+                        return 8;
+                    }
+                }
+                case CORSA ->
+                {
+                    return 6;
+                }
+                case ATTACCO ->
+                {
+                    if (tipoNemico == SQUALO)
+                    {
+                        return 8;
+                    }
 
-                    case CORSA -> 6;
+                    return 7;
+                }
+                case COLPO ->
+                {
+                    return 4;
+                }
+                case MORTE ->
+                {
+                    return 5;
+                }
+            }
 
-                    case ATTACCO -> 7;
-
-                    case COLPO -> 4;
-
-                    case MORTE -> 5;
-
-                    default -> 0;
-                };
-
-                //                case STELLA -> switch (statoNemico)
-                //                {
-                //
-                //                }
-                default -> throw new IllegalStateException("Tipo nemico sconosciuto: " + tipoNemico);
-            };
+            return 0;
         }
     }
 
@@ -62,7 +91,12 @@ public class Costanti
         {
             case GRANCHIO ->
             {
-                return 10;
+                return 50;
+            }
+
+            case STELLA, SQUALO ->
+            {
+                return 25;
             }
 
             default ->
@@ -79,6 +113,16 @@ public class Costanti
             case GRANCHIO ->
             {
                 return 15;
+            }
+
+            case STELLA ->
+            {
+                return 20;
+            }
+
+            case SQUALO ->
+            {
+                return 25;
             }
 
             default ->
@@ -140,7 +184,9 @@ public class Costanti
     public static class Direzioni
     {
         public static final int SINISTRA = 0;
+        public static final int SU = 1;
         public static final int DESTRA = 2;
+        public static final int SOTTO = 3;
     }
 
     public static class CostantiGiocatore
@@ -177,6 +223,10 @@ public class Costanti
         public static final int SPUNTONE = 4;
         public static final int CANNONE_SINISTRA = 5;
         public static final int CANNONE_DESTRA = 6;
+        public static final int ALBERO_UNO = 7;
+        public static final int ALBERO_DUE = 8;
+        public static final int ALBERO_TRE = 9;
+
 
         public static final int VALORE_POZIONE_ROSSA = 15;
         public static final int VALORE_POZIONE_BLU = 10;
@@ -212,6 +262,82 @@ public class Costanti
                 default -> 1;
             };
         }
+
+        public static int GetAlberoOffsetX(int tipoAlbero)
+        {
+            switch (tipoAlbero)
+            {
+                case ALBERO_UNO ->
+                {
+                    return (Gioco.DIMENSIONE_CASELLA / 2) - (GetLarghezzaAlbero (tipoAlbero) / 2);
+                }
+                case ALBERO_DUE ->
+                {
+                    return (int) (Gioco.DIMENSIONE_CASELLA / 2.5f);
+                }
+                case ALBERO_TRE ->
+                {
+                    return (int) (Gioco.DIMENSIONE_CASELLA / 1.65f);
+                }
+            }
+
+            return 0;
+        }
+
+        public static int GetAlberoOffsetY(int tipoAlbero)
+        {
+            switch (tipoAlbero)
+            {
+                case ALBERO_UNO ->
+                {
+                    return -GetAltezzaAlbero(tipoAlbero) + Gioco.DIMENSIONE_CASELLA * 2;
+                }
+                case ALBERO_DUE , ALBERO_TRE ->
+                {
+                    return -GetAltezzaAlbero(tipoAlbero) + (int) (Gioco.DIMENSIONE_CASELLA / 1.25f);
+                }
+            }
+            return 0;
+
+        }
+
+        public static int GetLarghezzaAlbero (int tipoAlbero)
+        {
+            switch (tipoAlbero)
+            {
+                case ALBERO_UNO ->
+                {
+                    return (int) (39 * Gioco.SCALA);
+                }
+                case ALBERO_DUE ->
+                {
+                    return (int) (62 * Gioco.SCALA);
+                }
+                case ALBERO_TRE ->
+                {
+                    return -(int) (62 * Gioco.SCALA);
+                }
+            }
+
+            return 0;
+        }
+
+        public static int GetAltezzaAlbero(int tipoAlbero)
+        {
+            switch (tipoAlbero)
+            {
+                case ALBERO_UNO ->
+                {
+                    return (int) (int) (92 * Gioco.SCALA);
+                }
+                case ALBERO_DUE, ALBERO_TRE ->
+                {
+                    return (int) (54 * Gioco.SCALA);
+                }
+            }
+
+            return 0;
+        }
     }
 
     public static class Proiettili
@@ -222,5 +348,27 @@ public class Costanti
         public static final int LARGHEZZA_PALLA_CANNONE = (int)(Gioco.SCALA * LARGHEZZA_PALLA_CANNONE_DEFAULT);
         public static final int ALTEZZA_PALLA_CANNONE = (int)(Gioco.SCALA * ALTEZZA_PALLA_CANNONE_DEFAULT);
         public static final float VEL_PALLA_CANNONE = 0.75f * Gioco.SCALA;
+    }
+
+    public static class Dialogo
+    {
+        public static final int DOMANDA = 0;
+        public static final int ESCLAMAZIONE = 1;
+
+        public static final int LARGHEZZA_DIALOGO = (int) (14 * Gioco.SCALA);
+        public static final int ALTEZZA_DIALOGO = (int) (12 * Gioco.SCALA);
+
+        public static int GetSpriteCont (int tipo)
+        {
+            switch (tipo)
+            {
+                case DOMANDA, ESCLAMAZIONE ->
+                {
+                    return 5;
+                }
+            }
+
+            return 0;
+        }
     }
 }
