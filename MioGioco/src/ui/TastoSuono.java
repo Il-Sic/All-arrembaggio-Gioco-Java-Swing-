@@ -24,7 +24,7 @@ public class TastoSuono extends PauseButton
     private void caricaSoundImgs ()
     {
         BufferedImage temp = CaricaSalva.GetAtltanteSprite (CaricaSalva.SOUND_BUTTONS);
-        soundImgs = new BufferedImage [2][3];                                                   // 2 e 3 perchè l' imagine ha 2 tipi diversi in 2 righe e 3 tipi diversi divisi nelle 3 colonne
+        soundImgs = new BufferedImage [2][3];
 
         for (int i = 0; i < soundImgs.length; i ++)
         {

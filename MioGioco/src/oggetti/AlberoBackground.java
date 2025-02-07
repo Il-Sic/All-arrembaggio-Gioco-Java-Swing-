@@ -2,12 +2,11 @@ package oggetti;
 
 import java.util.Random;
 
-public class AlberiBackground
+public class AlberoBackground
 {
-
     private int x, y, tipo, indiceAni, tickAni;
 
-    public AlberiBackground (int x, int y, int tipo)
+    public AlberoBackground(int x, int y, int tipo)
     {
         this.x = x;
         this.y = y;

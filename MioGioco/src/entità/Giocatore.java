@@ -23,7 +23,7 @@ public class Giocatore extends Entità
     private float xDrawOffset = 21 * Gioco.SCALA;
     private float yDrawOffset = 4 * Gioco.SCALA;
 
-    private float velSalto = -2.25f * Gioco.SCALA;
+    private float velSalto = -2.50f * Gioco.SCALA;
     private float velCadutaDopoCollisione =  0.5f * Gioco.SCALA;
 
     private BufferedImage barraStatoImg;
@@ -331,10 +331,7 @@ public class Giocatore extends Entità
 
     public void render (Graphics g, int lvlOffset)
     {
-        g.drawImage (animazioni [stato][indiceAni], (int) (hitbox.x - xDrawOffset) - lvlOffset + xFlip,  (int) (hitbox.y - yDrawOffset) , larghezza * lFlip, altezza, null);              // qui modifico l' immagine e la sua dimensione
-//        drawHitBox (g, lvlOffset);
-
-//        drawAttackBox (g, lvlOffset);
+        g.drawImage (animazioni [stato][indiceAni], (int) (hitbox.x - xDrawOffset) - lvlOffset + xFlip,  (int) (hitbox.y - yDrawOffset) , larghezza * lFlip, altezza, null);
 
         drawUI (g);
     }
@@ -350,17 +347,11 @@ public class Giocatore extends Entità
         g.fillRect (barraForzaXStart + xBarraStato, barraForzaYStart + yBarraStato, larghezzaForza, altezzaBarraForza);
     }
 
-
-    //    public void setRectPos (int x, int y)
-//    {
-//        this.x = x;
-//        this.y = y;
-//    }
     private void updateTickAnimazioni ()
     {
         tickAni ++;
 
-        if (tickAni >= VEL_ANI)                      // quando è uguale o supera cambia immagine simulando un animazione
+        if (tickAni >= VEL_ANI)
         {
             tickAni = 0;
             indiceAni ++;
@@ -601,7 +592,7 @@ public class Giocatore extends Entità
         {
             for (int i = 0; i < animazioni[j].length; i ++)
             {
-                animazioni [j][i] = img.getSubimage (i * 64, j * 40, 64, 40);               // j è la y, i è la x dell' immagine
+                animazioni [j][i] = img.getSubimage (i * 64, j * 40, 64, 40);
             }
         }
 

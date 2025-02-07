@@ -1,7 +1,6 @@
 package livelli;
 
 import main.Gioco;
-import statigioco.StatoGioco;
 import utilità.CaricaSalva;
 
 import java.awt.*;
@@ -10,14 +9,14 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
-public class GestioneLivello
+public class GestoreLivello
 {
     private Gioco gioco;
     private BufferedImage [] spriteLivello, spriteAcqua;
     private ArrayList <Livello> livelli;
     private int indiceLvl = 0, tickAni, indiceAni;
 
-    public GestioneLivello (Gioco gioco) throws URISyntaxException, IOException
+    public GestoreLivello(Gioco gioco) throws URISyntaxException, IOException
     {
         this.gioco = gioco;
         importaSpritesEsterni ();
@@ -77,21 +76,21 @@ public class GestioneLivello
         {
             for (int i = 0; i < livelli.get(indiceLvl).getDatiLvl()[0].length; i++)
             {
-                int index = livelli.get(indiceLvl).getIndiceSprite(i, j);
+                int indice = livelli.get(indiceLvl).getIndiceSprite(i, j);
                 int x = Gioco.DIMENSIONE_CASELLA * i - lvlOffset;
                 int y = Gioco.DIMENSIONE_CASELLA * j;
 
-                if (index == 48)
+                if (indice == 48)
                 {
                     g.drawImage(spriteAcqua[indiceAni], x, y, Gioco.DIMENSIONE_CASELLA, Gioco.DIMENSIONE_CASELLA, null);
                 }
-                else if (index == 49)
+                else if (indice == 49)
                 {
                     g.drawImage(spriteAcqua[4], x, y, Gioco.DIMENSIONE_CASELLA, Gioco.DIMENSIONE_CASELLA, null);
                 }
                 else
                 {
-                    g.drawImage(spriteLivello[index], x, y, Gioco.DIMENSIONE_CASELLA, Gioco.DIMENSIONE_CASELLA, null);
+                    g.drawImage(spriteLivello[indice], x, y, Gioco.DIMENSIONE_CASELLA, Gioco.DIMENSIONE_CASELLA, null);
                 }
             }
         }
@@ -133,6 +132,6 @@ public class GestioneLivello
 
     public void setIndiceLivello (int indiceLivello)
     {
-        this.indiceLvl = indiceLvl;
+        this.indiceLvl = indiceLivello;
     }
 }

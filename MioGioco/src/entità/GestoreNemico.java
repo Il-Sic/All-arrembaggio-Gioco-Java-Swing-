@@ -10,13 +10,13 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
-public class GestioneNemico
+public class GestoreNemico
 {
     private Playing playing;
     private BufferedImage [][] granchioArray, stellaArray, squaloArray;
     private Livello livelloCorrente;
 
-    public GestioneNemico (Playing playing)
+    public GestoreNemico(Playing playing)
     {
         this.playing = playing;
 
@@ -76,6 +76,13 @@ public class GestioneNemico
 
     private void drawSquali(Graphics g, int xLvlOffset)
     {
+        for (Squalo squalo : livelloCorrente.getSquali())
+        {
+            if (squalo.isAttivo())
+            {
+                g.drawImage(squaloArray[squalo.getStato()][squalo.getIndiceAni()], (int) squalo.getHitbox().x - xLvlOffset - SQUALO_DRAWOFFSET_X + squalo.xFlip(), (int) squalo.getHitbox().y - SQUALO_DRAWOFFSET_Y + (int) squalo.getPushDrawOffset(), LARGHEZZA_SQUALO * squalo.lFlip(), ALTEZZA_SQUALO, null);
+            }
+        }
     }
 
     private void drawStelle(Graphics g, int xLvlOffset)
@@ -96,10 +103,6 @@ public class GestioneNemico
             if (granchio.isAttivo())
             {
                 g.drawImage(granchioArray [granchio.getStatoNemico()][granchio.getIndiceAni()], (int) (granchio.getHitbox().x) - xLvlOffset - GRANCHIO_DRAWOFFSET_X + granchio.xFlip(), (int) (granchio.getHitbox().y) - GRANCHIO_DRAWOFFSET_Y, LARGHEZZA_GRANCHIO * granchio.lFlip(), ALTEZZA_GRANCHIO,null);
-
-//                granchio.drawHitBox(g, xLvlOffset);
-
-//                granchio.drawAttackBox (g, xLvlOffset);
             }
         }
     }

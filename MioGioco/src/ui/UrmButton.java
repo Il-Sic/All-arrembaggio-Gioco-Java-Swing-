@@ -13,7 +13,7 @@ public class UrmButton extends PauseButton
     private int indice, indiceRiga;
     private boolean mouseOver, mousePressed;
 
-    public UrmButton (int x, int y, int larghezza, int altezza, int indiceRiga)                     // indice riga perchè ci sono 3 tipi di bottoni su diverse righe
+    public UrmButton (int x, int y, int larghezza, int altezza, int indiceRiga)
     {
         super (x, y, larghezza, altezza);
         this.indiceRiga = indiceRiga;

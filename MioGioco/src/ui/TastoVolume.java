@@ -21,8 +21,8 @@ public class TastoVolume extends PauseButton
         super (x + larghezza / 2, y, LARGHEZZA_VOLUME, altezza);
         limiti.x -= LARGHEZZA_VOLUME / 2;
         buttonX = x + larghezza / 2;
-        this.x = x;                                                                         //
-        this.larghezza = larghezza;                                                         //      entrambi servono per il cursore effettivo altrimenti sarebbero cambiate
+        this.x = x;
+        this.larghezza = larghezza;
         minX = x + LARGHEZZA_VOLUME / 2;
         maxX = x + larghezza - LARGHEZZA_VOLUME / 2;
         caricaImgs ();

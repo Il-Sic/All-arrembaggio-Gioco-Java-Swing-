@@ -2,9 +2,9 @@ package statigioco;
 
 import effetti.EffettoDialogo;
 import effetti.Pioggia;
-import entità.GestioneNemico;
+import entità.GestoreNemico;
 import entità.Giocatore;
-import livelli.GestioneLivello;
+import livelli.GestoreLivello;
 import main.Gioco;
 import oggetti.GestoreOggetto;
 import ui.OverlayGameOver;
@@ -29,8 +29,8 @@ import static utilità.Costanti.Dialogo.*;
 public class Playing extends Stato implements StatoMetodi
 {
     private Giocatore giocatore;
-    private GestioneNemico gestioneNemico;
-    private GestioneLivello gestioneLivello;
+    private GestoreNemico gestoreNemico;
+    private GestoreLivello gestoreLivello;
     private GestoreOggetto gestoreOggetto;
     private OverlayPausa overlayPausa;
     private OverlayGameOver overlayGameOver;
@@ -94,11 +94,6 @@ public class Playing extends Stato implements StatoMetodi
     {
         caricaImgsDialogo ();
 
-        // Load dialogue array with premade objects, that gets activated when needed.
-        // This is a simple
-        // way of avoiding ConcurrentModificationException error. (Adding to a list that
-        // is being looped through.
-
         for (int i = 0; i < 10; i++)
         {
             effettiDialogo.add(new EffettoDialogo(0, 0, ESCLAMAZIONE));
@@ -135,33 +130,33 @@ public class Playing extends Stato implements StatoMetodi
 
     public void caricaLivelloSuccessivo ()
     {
-        gestioneLivello.setIndiceLivello (gestioneLivello.getIndiceLivello() + 1);
-        gestioneLivello.caricaLivelloSuccessivo ();
-        giocatore.setSpawn (gestioneLivello.getLivelloCorrente ().getSpawnGiocatore ());
+        gestoreLivello.setIndiceLivello (gestoreLivello.getIndiceLivello() + 1);
+        gestoreLivello.caricaLivelloSuccessivo ();
+        giocatore.setSpawn (gestoreLivello.getLivelloCorrente ().getSpawnGiocatore ());
         resettaTutto ();
         drawBarca = false;
     }
 
     private void caricaInizioLivello()
     {
-        gestioneNemico.caricaNemici (gestioneLivello.getLivelloCorrente ());
-        gestoreOggetto.caricaOggetti (gestioneLivello.getLivelloCorrente ());
+        gestoreNemico.caricaNemici (gestoreLivello.getLivelloCorrente ());
+        gestoreOggetto.caricaOggetti (gestoreLivello.getLivelloCorrente ());
     }
 
     private void calcolaLvlOffset()
     {
-        maxXLvlOffset = gestioneLivello.getLivelloCorrente ().getLvlOffset ();
+        maxXLvlOffset = gestoreLivello.getLivelloCorrente ().getLvlOffset ();
     }
 
     private void initClassi () throws URISyntaxException, IOException
     {
-        gestioneLivello = new GestioneLivello (gioco);
-        gestioneNemico = new GestioneNemico (this);
+        gestoreLivello = new GestoreLivello(gioco);
+        gestoreNemico = new GestoreNemico(this);
         gestoreOggetto = new GestoreOggetto (this);
 
         giocatore = new Giocatore (200, 200, (int) (64 * Gioco.SCALA), (int) (40 * Gioco.SCALA), this);
-        giocatore.caricaDatiLvl (gestioneLivello.getLivelloCorrente ().getDatiLvl ());
-        giocatore.setSpawn (gestioneLivello.getLivelloCorrente ().getSpawnGiocatore ());
+        giocatore.caricaDatiLvl (gestoreLivello.getLivelloCorrente ().getDatiLvl ());
+        giocatore.setSpawn (gestoreLivello.getLivelloCorrente ().getSpawnGiocatore ());
 
         overlayPausa = new OverlayPausa (this);
         overlayGameOver = new OverlayGameOver (this);
@@ -169,11 +164,6 @@ public class Playing extends Stato implements StatoMetodi
         overlayGiocoCompletato = new OverlayGiocoCompletato (this);
 
         pioggia = new Pioggia();
-    }
-
-    public void windowFocusLost ()
-    {
-        giocatore.resetDirBooleans ();              // se ad esempio clicco su una pagina esterna al gioco si ferma il personaggio invece di continuare a muoversi in loop             // se ad esempio clicco su una pagina esterna al gioco si ferma il personaggio invece di continuare a muoversi in loop
     }
 
     public Giocatore getGiocatore ()
@@ -218,10 +208,10 @@ public class Playing extends Stato implements StatoMetodi
                 pioggia.update(xLvlOffset);
             }
 
-            gestioneLivello.update();
-            gestoreOggetto.update(gestioneLivello.getLivelloCorrente().getDatiLvl(), giocatore);
+            gestoreLivello.update();
+            gestoreOggetto.update(gestoreLivello.getLivelloCorrente().getDatiLvl(), giocatore);
             giocatore.update();
-            gestioneNemico.update(gestioneLivello.getLivelloCorrente().getDatiLvl(), giocatore);
+            gestoreNemico.update(gestoreLivello.getLivelloCorrente().getDatiLvl(), giocatore);
             controllaVicinoBordo();
 
             if (drawBarca)
@@ -360,9 +350,9 @@ public class Playing extends Stato implements StatoMetodi
 
         }
 
-        gestioneLivello.draw(g, xLvlOffset);
+        gestoreLivello.draw(g, xLvlOffset);
         giocatore.render(g, xLvlOffset);
-        gestioneNemico.draw(g, xLvlOffset);
+        gestoreNemico.draw(g, xLvlOffset);
         gestoreOggetto.draw(g, xLvlOffset);
         gestoreOggetto.drawAlberiBackground (g, xLvlOffset);
         drawDialogo (g, xLvlOffset);
@@ -543,7 +533,7 @@ public class Playing extends Stato implements StatoMetodi
         setDrawPioggiaBoolean ();
 
         giocatore.resettaTutto ();
-        gestioneNemico.resettaTuttoNemici ();
+        gestoreNemico.resettaTuttoNemici ();
         gestoreOggetto.resettaTuttiOggetti();
         effettiDialogo.clear();
     }
@@ -558,7 +548,7 @@ public class Playing extends Stato implements StatoMetodi
 
     public void controllaColpoNemico (Rectangle2D.Float attackBox)
     {
-        gestioneNemico.controllaColpoNemico (attackBox);
+        gestoreNemico.controllaColpoNemico (attackBox);
     }
 
     public void controllaHitOggetto (Rectangle2D.Float attackbox)
@@ -591,9 +581,9 @@ public class Playing extends Stato implements StatoMetodi
         this.gameOver = gameOver;
     }
 
-    public GestioneNemico getGestioneNemico ()
+    public GestoreNemico getGestioneNemico ()
     {
-        return gestioneNemico;
+        return gestoreNemico;
     }
 
     public GestoreOggetto getGestoreOggetto ()
@@ -601,9 +591,9 @@ public class Playing extends Stato implements StatoMetodi
         return gestoreOggetto;
     }
 
-    public GestioneLivello getGestioneLivello ()
+    public GestoreLivello getGestioneLivello ()
     {
-        return gestioneLivello;
+        return gestoreLivello;
     }
 
     public void setMaxLvlOffset (int lvlOffset)
@@ -614,11 +604,11 @@ public class Playing extends Stato implements StatoMetodi
     public void setLivelloCompletato (boolean livelloCompletato)
     {
         gioco.getLettoreAudio().livelloCompletato();
-        if (gestioneLivello.getIndiceLivello() + 1 >= gestioneLivello.getNumeroLivelli())
+        if (gestoreLivello.getIndiceLivello() + 1 >= gestoreLivello.getNumeroLivelli())
         {
             giocoCompletato = true;
-            gestioneLivello.setIndiceLivello (0);
-            gestioneLivello.caricaLivelloSuccessivo();
+            gestoreLivello.setIndiceLivello (0);
+            gestoreLivello.caricaLivelloSuccessivo();
             resettaTutto();
             return;
         }

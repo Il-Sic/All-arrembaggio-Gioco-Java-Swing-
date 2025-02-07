@@ -26,7 +26,7 @@ public class Livello
     private ArrayList<Granchio> granchi = new ArrayList<>();
     private ArrayList<Stella> stelle = new ArrayList<>();
     private ArrayList<Squalo> squali = new ArrayList<>();
-    private ArrayList<AlberiBackground> alberi = new ArrayList<>();
+    private ArrayList<AlberoBackground> alberi = new ArrayList<>();
     private ArrayList<Erba> erba = new ArrayList<>();
 
     private int larghezzaCaselleLvl;
@@ -76,12 +76,12 @@ public class Livello
         {
             case 0, 1, 2, 3, 30, 31, 33, 34, 35, 36, 37, 38, 39 ->
             {
-                erba.add(new Erba((int) (x * Gioco.DIMENSIONE_CASELLA), (int) (y * Gioco.DIMENSIONE_CASELLA) - Gioco.DIMENSIONE_CASELLA, getRndGrassType(x)));
+                erba.add(new Erba((int) (x * Gioco.DIMENSIONE_CASELLA), (int) (y * Gioco.DIMENSIONE_CASELLA) - Gioco.DIMENSIONE_CASELLA, getRandomTipoErba(x)));
             }
         }
     }
 
-    private int getRndGrassType(int xPos)
+    private int getRandomTipoErba(int xPos)
     {
         return xPos % 2;
     }
@@ -131,7 +131,7 @@ public class Livello
             }
             case ALBERO_UNO, ALBERO_DUE, ALBERO_TRE ->
             {
-                alberi.add(new AlberiBackground(x * Gioco.DIMENSIONE_CASELLA, y * Gioco.DIMENSIONE_CASELLA, valoreBlu));
+                alberi.add(new AlberoBackground(x * Gioco.DIMENSIONE_CASELLA, y * Gioco.DIMENSIONE_CASELLA, valoreBlu));
             }
         }
     }
@@ -198,7 +198,7 @@ public class Livello
         return stelle;
     }
 
-    public ArrayList<AlberiBackground> getAlberi()
+    public ArrayList<AlberoBackground> getAlberi()
     {
         return alberi;
     }

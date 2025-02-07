@@ -36,7 +36,7 @@ public class Gioco implements Runnable
 
     public Gioco () throws URISyntaxException, IOException
     {
-        initClassi();                               // precedenza (va messo prima)
+        initClassi();
 
         pannello = new PannelloGioco (this);
         finestra = new FinestraGioco (pannello);
@@ -117,7 +117,6 @@ public class Gioco implements Runnable
 
             }
         }
-
     }
 
     @Override

@@ -13,7 +13,7 @@ public class Menu extends Stato implements StatoMetodi
 {
     private MenuButton [] buttons = new MenuButton [3];
     private BufferedImage backgroundImg, sfondoFinestraMenu;
-    private int menuX, menuY, menuLargezza, menuAltezza;
+    private int menuX, menuY, menuLarghezza, menuAltezza;
 
     public Menu (Gioco gioco)
     {
@@ -26,9 +26,9 @@ public class Menu extends Stato implements StatoMetodi
     private void caricaBackground ()
     {
         backgroundImg = CaricaSalva.GetAtltanteSprite (CaricaSalva.MENU_BACKGROUND);
-        menuLargezza = (int) (backgroundImg.getWidth () * Gioco.SCALA);
+        menuLarghezza = (int) (backgroundImg.getWidth () * Gioco.SCALA);
         menuAltezza = (int) (backgroundImg.getHeight () * Gioco.SCALA);
-        menuX = Gioco.LARGHEZZA_GIOCO / 2 - menuLargezza / 2;
+        menuX = Gioco.LARGHEZZA_GIOCO / 2 - menuLarghezza / 2;
         menuY = (int) (45 * Gioco.SCALA);
     }
 
@@ -53,14 +53,12 @@ public class Menu extends Stato implements StatoMetodi
     {
         g.drawImage (sfondoFinestraMenu, 0, 0, Gioco.LARGHEZZA_GIOCO, Gioco.ALTEZZA_GIOCO, null);
 
-        g.drawImage (backgroundImg, menuX, menuY, menuLargezza, menuAltezza, null);
+        g.drawImage (backgroundImg, menuX, menuY, menuLarghezza, menuAltezza, null);
 
         for (MenuButton mb : buttons)
         {
             mb.draw (g);
         }
-//        g.setColor (Color.black);
-//        g.drawString ("MENU", Gioco.LARGHEZZA_GIOCO / 2, 200);
     }
 
     @Override

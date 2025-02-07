@@ -15,7 +15,7 @@ public class OverlayPausa
 {
     private Playing playing;
     private BufferedImage backgroundImg;
-    private int bgX, bgY, bgL, bgA;                         // x, y, larghezza e altezza background
+    private int bgX, bgY, bgL, bgA;
     private OpzioniAudio opzioniAudio;
     private UrmButton menuB, rigiocaB, riprendiB;
     private TastoVolume tastoVolume;
@@ -175,7 +175,5 @@ public class OverlayPausa
     private boolean isDentro(MouseEvent e, PauseButton b)
     {
         return b.getLimiti ().contains (e.getX (), e.getY ());
-
     }
-
 }

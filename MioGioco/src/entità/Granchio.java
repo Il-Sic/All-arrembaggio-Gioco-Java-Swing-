@@ -15,7 +15,6 @@ public class Granchio extends Nemico
     }
 
 
-
     public void update (int [][] datiLvl, Playing playing)
     {
         updateComportamento (datiLvl, playing);

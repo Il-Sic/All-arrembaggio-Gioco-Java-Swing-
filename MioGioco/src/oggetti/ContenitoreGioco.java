@@ -6,7 +6,6 @@ import static utilità.Costanti.CostantiOggetto.CASSA;
 
 public class ContenitoreGioco extends OggettoGioco
 {
-
     public ContenitoreGioco (int x, int y, int tipoOggetto)
     {
         super (x, y, tipoOggetto);

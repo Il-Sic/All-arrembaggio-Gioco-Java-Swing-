@@ -4,7 +4,6 @@ import main.Gioco;
 
 public class Spuntone extends OggettoGioco
 {
-
     public Spuntone (int x, int y, int tipoOggetto)
     {
         super (x, y, tipoOggetto);

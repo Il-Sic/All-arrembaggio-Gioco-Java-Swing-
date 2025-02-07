@@ -62,7 +62,9 @@ public class OverlayGiocoCompletato
         esci.setMouseOver(false);
 
         if (isIn(esci, e))
+        {
             esci.setMouseOver(true);
+        }
     }
 
     public void mouseReleased (MouseEvent e)
@@ -74,7 +76,6 @@ public class OverlayGiocoCompletato
                 playing.resettaTutto();
                 playing.resettaGiocoCompletato();
                 playing.setStato(StatoGioco.MENU);
-
             }
         }
 

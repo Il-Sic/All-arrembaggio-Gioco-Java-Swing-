@@ -11,7 +11,7 @@ import static main.Gioco.ALTEZZA_GIOCO;
 
 public class PannelloGioco extends JPanel
 {
-    private MouseInputs mouseInputs;                        // in modo da averli in entrambi e vedere gli effetti del mouse sul pannello
+    private MouseInputs mouseInputs;
     private Gioco gioco;
 
     public PannelloGioco (Gioco gioco)
@@ -32,17 +32,10 @@ public class PannelloGioco extends JPanel
         System.out.println ("size: " + LARGHEZZA_GIOCO + " : " + ALTEZZA_GIOCO);
     }
 
-    public void updateGioco ()
-    {
-
-    }
-
     public void paintComponent (Graphics g)
     {
         super.paintComponent (g);
         gioco.render (g);
-
-        //g.drawImage (img.getSubimage (0, 0, 64, 40), 0, 0, null);
     }
 
     public Gioco getGioco ()

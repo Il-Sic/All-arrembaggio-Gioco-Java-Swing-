@@ -115,6 +115,5 @@ public class MouseInputs implements MouseListener, MouseMotionListener
                 pannello.getGioco ().getMenu ().mouseMoved (e);
             }
         }
-        //pannello.getGioco().getGiocatore().setRectPos (e.getX (), e.getY());
     }
 }

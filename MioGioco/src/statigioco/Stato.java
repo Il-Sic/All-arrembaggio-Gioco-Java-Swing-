@@ -25,7 +25,8 @@ public class Stato
         return mb.getLimiti ().contains (e.getX (), e.getY ());
     }
 
-    public void setStato (StatoGioco stato) {
+    public void setStato (StatoGioco stato)
+    {
         switch (stato)
         {
             case MENU -> gioco.getLettoreAudio().riproduciCanzone(LettoreAudio.MENU_1);

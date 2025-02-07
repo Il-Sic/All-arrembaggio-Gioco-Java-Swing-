@@ -12,8 +12,6 @@ public class CaricaSalva
 {
     public static final String ALTLANTE_GIOCATORE = "player_sprites.png";
     public static final String ALTLANTE_LIVELLO = "outside_sprites.png";
-//    public static final String DATI_LIVELLO_1 = "level_one_data.png";
-//    public static final String DATI_LIVELLO_1 = "level_one_data_long.png";
     public static final String MENU_BUTTONS = "button_atlas.png";
     public static final String MENU_BACKGROUND = "menu_background.png";
     public static final String MENU_SFONDO_FINESTRA = "Designer-5.png";
@@ -48,7 +46,7 @@ public class CaricaSalva
     public static final String BARCA = "ship.png";
 
 
-    public static BufferedImage GetAtltanteSprite (String nomeFile)                        // restituisce un immagine memorizzata nel buffer
+    public static BufferedImage GetAtltanteSprite (String nomeFile)
     {
         BufferedImage img = null;
         InputStream is = CaricaSalva.class.getResourceAsStream ("/" + nomeFile);

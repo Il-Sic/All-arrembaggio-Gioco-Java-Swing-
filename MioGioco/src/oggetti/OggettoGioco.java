@@ -72,12 +72,6 @@ public class OggettoGioco
         hitbox = new Rectangle2D.Float(x, y, (int) (larghezza * Gioco.SCALA), (int) (altezza * Gioco.SCALA));
     }
 
-    public void drawHitbox (Graphics g, int xLvlOffset)
-    {
-        g.setColor (Color.PINK);
-        g.drawRect((int) hitbox.x - xLvlOffset, (int) hitbox.y, (int) hitbox.width, (int) hitbox.height);
-    }
-
     public int getTipoOggetto ()
     {
         return tipoOggetto;

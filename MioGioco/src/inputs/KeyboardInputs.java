@@ -9,10 +9,12 @@ import java.awt.event.KeyListener;
 public class KeyboardInputs implements KeyListener
 {
     private PannelloGioco pannello;
+
     public KeyboardInputs (PannelloGioco pannello)
     {
         this.pannello = pannello;
     }
+
     @Override
     public void keyTyped (KeyEvent e)
     {

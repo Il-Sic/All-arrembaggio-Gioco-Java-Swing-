@@ -188,7 +188,7 @@ public class GestoreOggetto
 
     private void updateAlberiBackground ()
     {
-        for (AlberiBackground aB : livelloCorrente.getAlberi ())
+        for (AlberoBackground aB : livelloCorrente.getAlberi ())
         {
             aB.update();
         }
@@ -299,7 +299,7 @@ public class GestoreOggetto
 
     public void drawAlberiBackground (Graphics g, int xLvlOffset)
     {
-        for (AlberiBackground aB : livelloCorrente.getAlberi ())
+        for (AlberoBackground aB : livelloCorrente.getAlberi ())
         {
 
             int tipo = aB.getTipo();

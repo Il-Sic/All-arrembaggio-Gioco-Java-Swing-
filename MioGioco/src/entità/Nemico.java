@@ -168,7 +168,7 @@ public class Nemico extends Entità
             {
                 hitbox.x += velX;
 
-                return;                                             // importante per non "looparlo" nella stessa posizione
+                return;
             }
         }
 
