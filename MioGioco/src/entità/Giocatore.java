@@ -83,6 +83,8 @@ public class Giocatore extends Entità
     private void initAttackBox()
     {
         attackBox = new Rectangle2D.Float (x, y, (int) (20 * Gioco.SCALA), (int) (20 * Gioco.SCALA));
+
+        resetAttackBox ();
     }
 
     public void update ()
@@ -195,7 +197,19 @@ public class Giocatore extends Entità
 
     private void updateAttackBox ()
     {
-        if (destra || forzaAttaccoAttiva && lFlip == 1)
+        if (sinistra && destra)
+        {
+            if (lFlip == 1)
+            {
+                attackBox.x = hitbox.x + hitbox.width + (int) (Gioco.SCALA * 10);
+            }
+            else
+            {
+                attackBox.x = hitbox.x - hitbox.width - (int) (Gioco.SCALA * 10);
+            }
+        }
+
+        else if (destra || forzaAttaccoAttiva && lFlip == 1)
         {
             attackBox.x = hitbox.x + hitbox.width + (int) (Gioco.SCALA * 10);
         }
@@ -391,7 +405,7 @@ public class Giocatore extends Entità
 
         float velX = 0;
 
-        if (sinistra)
+        if (sinistra && !destra)
         {
             velX -= velPg;
 
@@ -399,7 +413,7 @@ public class Giocatore extends Entità
             lFlip = -1;
         }
 
-        if (destra)
+        if (!sinistra && destra)
         {
             velX += velPg;
 
@@ -409,7 +423,7 @@ public class Giocatore extends Entità
 
         if (forzaAttaccoAttiva)
         {
-            if (!sinistra && !destra)
+            if (!sinistra && !destra || (sinistra && destra))
             {
                 if (lFlip == -1)
                 {
@@ -576,14 +590,29 @@ public class Giocatore extends Entità
         inAria = false;
         attacco = false;
         movimento = false;
+        velAria = 0f;
         stato = IDLE;
         vitaCorrente = vitaMax;
+
         hitbox.x = x;
         hitbox.y = y;
+        resetAttackBox ();
 
         if (!isEntitàSulPavimento(hitbox, datiLvl))
         {
             inAria = true;
+        }
+    }
+
+    private void resetAttackBox()
+    {
+        if (lFlip == 1)
+        {
+            attackBox.x = hitbox.x + hitbox.width + (int) (Gioco.SCALA * 10);
+        }
+        else
+        {
+            attackBox.x = hitbox.x + hitbox.width - (int) (Gioco.SCALA * 10);
         }
     }
 }

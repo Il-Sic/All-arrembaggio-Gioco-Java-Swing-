@@ -66,9 +66,9 @@ public class Playing extends Stato implements StatoMetodi
 
     public void caricaLivelloSuccessivo ()
     {
-        resettaTutto ();
         gestioneLivello.caricaLivelloSuccessivo ();
         giocatore.setSpawn (gestioneLivello.getLivelloCorrente ().getSpawnGiocatore ());
+        resettaTutto ();
     }
 
     private void caricaInizioLivello()

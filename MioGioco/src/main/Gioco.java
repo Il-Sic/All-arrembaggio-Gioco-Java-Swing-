@@ -41,7 +41,7 @@ public class Gioco implements Runnable
         pannello = new PannelloGioco (this);
         finestra = new FinestraGioco (pannello);
         pannello.setFocusable (true);
-        pannello.requestFocus ();
+        pannello.requestFocusInWindow ();
 
         startGameLoop();
     }

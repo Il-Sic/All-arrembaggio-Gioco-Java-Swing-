@@ -62,4 +62,9 @@ public abstract class Entità
     {
         return indiceAni;
     }
+
+    public int getVitaCorrente ()
+    {
+        return vitaCorrente;
+    }
 }

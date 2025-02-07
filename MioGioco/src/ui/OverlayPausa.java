@@ -113,6 +113,7 @@ public class OverlayPausa
         {
             if (menuB.isMousePressed ())
             {
+                playing.resettaTutto();
                 playing.setStato (StatoGioco.MENU);
                 playing.riprendiGioco();
             }

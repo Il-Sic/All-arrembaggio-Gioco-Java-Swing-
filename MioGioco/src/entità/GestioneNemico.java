@@ -75,11 +75,14 @@ public class GestioneNemico
         {
             if (granchio.isAttivo())
             {
-                if (attackBox.intersects (granchio.getHitbox()))
+                if (granchio.getVitaCorrente() > 0)
                 {
-                    granchio.ferisci (10);
+                    if (attackBox.intersects (granchio.getHitbox()))
+                    {
+                        granchio.ferisci (10);
 
-                    return;
+                        return;
+                    }
                 }
             }
         }
