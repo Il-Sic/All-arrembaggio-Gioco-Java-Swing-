@@ -188,5 +188,4 @@ public class Stella extends Nemico
         nuovoStato(IDLE);
         playing.aggiungiDialogo((int) hitbox.x, (int) hitbox.y, DOMANDA);
     }
-
 }

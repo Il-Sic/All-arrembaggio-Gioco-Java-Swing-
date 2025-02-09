@@ -148,8 +148,12 @@ public class Giocatore extends Entità
         if (movimento)
         {
             controllaPozioneToccata ();
-            controllaSpuntoniToccati ();
             controllaInAcqua();
+
+            if (controllaSpuntoniToccatiGiocatore())
+            {
+                vitaCorrente = 0;
+            }
 
             casellaY = (int) (hitbox.y / Gioco.DIMENSIONE_CASELLA);
 
@@ -176,7 +180,7 @@ public class Giocatore extends Entità
 
     private void controllaInAcqua()
     {
-        if (IsEntitàInAcqua (hitbox, playing.getGestioneLivello().getLivelloCorrente().getDatiLvl()))
+        if (IsEntitàInAcqua (hitbox, playing.getGestoreLivello().getLivelloCorrente().getDatiLvl()))
         {
             vitaCorrente = 0;
         }
@@ -195,19 +199,14 @@ public class Giocatore extends Entità
         }
     }
 
-    private void controllaSpuntoniToccati ()
+    private boolean controllaSpuntoniToccatiGiocatore ()
     {
-        playing.controllaSpuntoniToccati (this);
+        return playing.controllaSpuntoniToccatiEntità(this);
     }
 
     private void controllaPozioneToccata()
     {
         playing.controllaPozioneToccata (hitbox);
-    }
-
-    public void killa ()
-    {
-        vitaCorrente = 0;
     }
 
     private void controllaAttacco()

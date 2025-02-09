@@ -125,7 +125,11 @@ public class Nemico extends Entità
         if (stato != COLPO && stato != MORTE)
         {
             updateInAria (datiLvl);
-            playing.getGestoreOggetto().controllaSpuntoniToccati (playing.getGiocatore());
+
+            if (playing.getGestoreOggetto().controllaSpuntoniToccati (this))
+            {
+                ferisci(vitaMax);
+            }
 
             if (IsEntitàInAcqua (hitbox, datiLvl))
             {
@@ -197,14 +201,6 @@ public class Nemico extends Entità
         {
             dirCamminata = SINISTRA;
         }
-    }
-
-    public void nuovoStato(int statoNemico)
-    {
-        this.stato = statoNemico;
-
-        tickAni = 0;
-        indiceAni = 0;
     }
 
     public void ferisci (int valore)

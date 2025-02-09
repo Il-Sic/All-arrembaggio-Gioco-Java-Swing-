@@ -7,6 +7,7 @@ import java.awt.event.WindowFocusListener;
 public class FinestraGioco extends JFrame
 {
     private JFrame jframe;
+
     public FinestraGioco (PannelloGioco pannello)
     {
         jframe = new JFrame ();

@@ -1,5 +1,6 @@
 package oggetti;
 
+import entità.Entità;
 import entità.Giocatore;
 import livelli.Livello;
 import main.Gioco;
@@ -33,20 +34,22 @@ public class GestoreOggetto
     public GestoreOggetto (Playing playing)
     {
         this.playing = playing;
-        livelloCorrente = playing.getGestioneLivello().getLivelloCorrente();
+        livelloCorrente = playing.getGestoreLivello().getLivelloCorrente();
 
         caricaImgs ();
     }
 
-    public void controllaSpuntoniToccati (Giocatore giocatore)
+    public boolean controllaSpuntoniToccati (Entità entità)
     {
-        for (Spuntone s : livelloCorrente.getSpuntoni())
+        for (Spuntone spuntone : livelloCorrente.getSpuntoni())
         {
-            if (s.getHitbox().intersects (giocatore.getHitbox()))
+            if (spuntone.getHitbox().intersects (entità.getHitbox()))
             {
-                giocatore.killa ();
+                return true;
             }
         }
+
+        return false;
     }
 
     public void controllaOggettoToccato (Rectangle2D.Float hitbox)
@@ -385,7 +388,7 @@ public class GestoreOggetto
 
     public void resettaTuttiOggetti ()
     {
-        caricaOggetti (playing.getGestioneLivello().getLivelloCorrente());
+        caricaOggetti (playing.getGestoreLivello().getLivelloCorrente());
 
         for (Pozione p : pozioni)
         {

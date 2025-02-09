@@ -28,7 +28,7 @@ public class GestoreNemico
         this.livelloCorrente = livello;
     }
 
-    public void update (int [][] datiLvl, Giocatore giocatore)
+    public void update (int [][] datiLvl)
     {
         boolean isAttivoQualcosa = false;
 
@@ -59,7 +59,6 @@ public class GestoreNemico
             }
         }
 
-
         if (!isAttivoQualcosa)
         {
             playing.setLivelloCompletato (true);
@@ -71,7 +70,6 @@ public class GestoreNemico
         drawGranchi (g, xLvlOffset);
         drawStelle (g, xLvlOffset);
         drawSquali (g, xLvlOffset);
-
     }
 
     private void drawSquali(Graphics g, int xLvlOffset)
@@ -125,21 +123,21 @@ public class GestoreNemico
             }
         }
 
-        for (Stella s : livelloCorrente.getStelle())
+        for (Stella stella : livelloCorrente.getStelle())
         {
-            if (s.isAttivo())
+            if (stella.isAttivo())
             {
-                if (s.getStato() == ATTACCO && s.getIndiceAni() >= 3)
+                if (stella.getStato() == ATTACCO && stella.getIndiceAni() >= 3)
                 {
                     return;
                 }
                 else
                 {
-                    if (s.getStato() != MORTE && s.getStato() != COLPO)
+                    if (stella.getStato() != MORTE && stella.getStato() != COLPO)
                     {
-                        if (attackBox.intersects(s.getHitbox()))
+                        if (attackBox.intersects(stella.getHitbox()))
                         {
-                            s.ferisci(20);
+                            stella.ferisci(30);
                             return;
                         }
                     }
@@ -147,15 +145,15 @@ public class GestoreNemico
             }
         }
 
-        for (Squalo s : livelloCorrente.getSquali())
+        for (Squalo squalo : livelloCorrente.getSquali())
         {
-            if (s.isAttivo())
+            if (squalo.isAttivo())
             {
-                if (s.getStato() != MORTE && s.getStato() != COLPO)
+                if (squalo.getStato() != MORTE && squalo.getStato() != COLPO)
                 {
-                    if (attackBox.intersects(s.getHitbox()))
+                    if (attackBox.intersects(squalo.getHitbox()))
                     {
-                        s.ferisci(20);
+                        squalo.ferisci(20);
                         return;
                     }
                 }
@@ -170,14 +168,6 @@ public class GestoreNemico
         squaloArray = getImgArr(CaricaSalva.GetAtltanteSprite(CaricaSalva.ATLANTE_SQUALO), 8, 5, LARGHEZZA_SQUALO_DEFAULT, ALTEZZA_SQUALO_DEFAULT);
     }
 
-    public void resettaTuttoNemici()
-    {
-        for (Granchio granchio : livelloCorrente.getGranchi())
-        {
-            granchio.resettaNemico ();
-        }
-    }
-
     private BufferedImage[][] getImgArr(BufferedImage atlas, int xSize, int ySize, int spriteW, int spriteH)
     {
         BufferedImage[][] tempArr = new BufferedImage[ySize][xSize];
@@ -190,23 +180,22 @@ public class GestoreNemico
             }
         }
 
-
         return tempArr;
     }
 
     public void resettaTuttiNemici ()
     {
-        for (Granchio c : livelloCorrente.getGranchi())
+        for (Granchio granchio : livelloCorrente.getGranchi())
         {
-            c.resettaNemico();
+            granchio.resettaNemico();
         }
-        for (Stella s : livelloCorrente.getStelle())
+        for (Stella stella : livelloCorrente.getStelle())
         {
-            s.resettaNemico();
+            stella.resettaNemico();
         }
-        for (Squalo s : livelloCorrente.getSquali())
+        for (Squalo squalo : livelloCorrente.getSquali())
         {
-            s.resettaNemico();
+            squalo.resettaNemico();
         }
     }
 }

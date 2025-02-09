@@ -96,7 +96,7 @@ public class OverlayLivelloCompletato
             if (successivo.isMousePressed())
             {
                 playing.caricaLivelloSuccessivo();
-                playing.getGioco().getLettoreAudio().setCanzoneLivello (playing.getGestioneLivello().getIndiceLivello());
+                playing.getGioco().getLettoreAudio().setCanzoneLivello (playing.getGestoreLivello().getIndiceLivello());
             }
         }
 
@@ -115,6 +115,4 @@ public class OverlayLivelloCompletato
             menu.setMousePressed (true);
         }
     }
-
-
 }

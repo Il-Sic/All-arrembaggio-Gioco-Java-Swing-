@@ -39,7 +39,7 @@ public class GestoreLivello
     public void caricaLivelloSuccessivo ()
     {
         Livello nuovoLivello = livelli.get (indiceLvl);
-        gioco.getPlaying ().getGestioneNemico ().caricaNemici (nuovoLivello);
+        gioco.getPlaying ().getGestoreNemico().caricaNemici (nuovoLivello);
         gioco.getPlaying ().getGiocatore ().caricaDatiLvl (nuovoLivello.getDatiLvl ());
         gioco.getPlaying ().setMaxLvlOffset (nuovoLivello.getLvlOffset ());
         gioco.getPlaying ().getGestoreOggetto ().caricaOggetti (nuovoLivello);

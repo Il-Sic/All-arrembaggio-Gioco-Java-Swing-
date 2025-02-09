@@ -104,7 +104,7 @@ public class OverlayGameOver
             if (gioca.isMousePressed ())
             {
                 playing.resettaTutto ();
-                playing.getGioco().getLettoreAudio().setCanzoneLivello(playing.getGestioneLivello().getIndiceLivello());
+                playing.getGioco().getLettoreAudio().setCanzoneLivello(playing.getGestoreLivello().getIndiceLivello());
             }
         }
 

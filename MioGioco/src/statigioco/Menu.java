@@ -94,7 +94,7 @@ public class Menu extends Stato implements StatoMetodi
 
                 if (mb.getStato() == StatoGioco.PLAYING)
                 {
-                    gioco.getLettoreAudio().setCanzoneLivello(gioco.getPlaying().getGestioneLivello().getIndiceLivello());
+                    gioco.getLettoreAudio().setCanzoneLivello(gioco.getPlaying().getGestoreLivello().getIndiceLivello());
                 }
 
                 break;

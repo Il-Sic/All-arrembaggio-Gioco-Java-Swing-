@@ -30,7 +30,7 @@ public class Stato
         switch (stato)
         {
             case MENU -> gioco.getLettoreAudio().riproduciCanzone(LettoreAudio.MENU_1);
-            case PLAYING -> gioco.getLettoreAudio().setCanzoneLivello(gioco.getPlaying().getGestioneLivello().getIndiceLivello());
+            case PLAYING -> gioco.getLettoreAudio().setCanzoneLivello(gioco.getPlaying().getGestoreLivello().getIndiceLivello());
         }
         StatoGioco.stato = stato;
     }

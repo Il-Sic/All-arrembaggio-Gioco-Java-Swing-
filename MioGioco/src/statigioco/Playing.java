@@ -2,6 +2,7 @@ package statigioco;
 
 import effetti.EffettoDialogo;
 import effetti.Pioggia;
+import entità.Entità;
 import entità.GestoreNemico;
 import entità.Giocatore;
 import livelli.GestoreLivello;
@@ -211,7 +212,7 @@ public class Playing extends Stato implements StatoMetodi
             gestoreLivello.update();
             gestoreOggetto.update(gestoreLivello.getLivelloCorrente().getDatiLvl(), giocatore);
             giocatore.update();
-            gestoreNemico.update(gestoreLivello.getLivelloCorrente().getDatiLvl(), giocatore);
+            gestoreNemico.update(gestoreLivello.getLivelloCorrente().getDatiLvl());
             controllaVicinoBordo();
 
             if (drawBarca)
@@ -474,24 +475,34 @@ public class Playing extends Stato implements StatoMetodi
         {
             switch (e.getKeyCode())
             {
-                case KeyEvent.VK_A ->
+                case KeyEvent.VK_A, KeyEvent.VK_LEFT->
                 {
                     giocatore.setSinistra (true);
                 }
 
-                case KeyEvent.VK_D ->
+                case KeyEvent.VK_D, KeyEvent.VK_RIGHT->
                 {
                     giocatore.setDestra (true);
                 }
 
-                case KeyEvent.VK_SPACE ->
+                case KeyEvent.VK_SPACE, KeyEvent.VK_UP ->
                 {
                     giocatore.setSalto (true);
                 }
 
+                case KeyEvent.VK_Z ->
+                {
+                    giocatore.setAttacco (true);
+                }
+
+                case KeyEvent.VK_X ->
+                {
+                    giocatore.forzaAttacco();
+                }
+
                 case KeyEvent.VK_ESCAPE ->
                 {
-                    inPausa = !inPausa;                             // piccola scappatoia per fare il contrario di quello che è in quel momento
+                    inPausa = !inPausa;
                 }
             }
         }
@@ -505,17 +516,17 @@ public class Playing extends Stato implements StatoMetodi
         {
             switch (e.getKeyCode())
             {
-                case KeyEvent.VK_A ->
+                case KeyEvent.VK_A, KeyEvent.VK_LEFT ->
                 {
                     giocatore.setSinistra (false);
                 }
 
-                case KeyEvent.VK_D ->
+                case KeyEvent.VK_D, KeyEvent.VK_RIGHT ->
                 {
                     giocatore.setDestra (false);
                 }
 
-                case KeyEvent.VK_SPACE ->
+                case KeyEvent.VK_SPACE, KeyEvent.VK_UP ->
                 {
                     giocatore.setSalto (false);
                 }
@@ -533,7 +544,7 @@ public class Playing extends Stato implements StatoMetodi
         setDrawPioggiaBoolean ();
 
         giocatore.resettaTutto ();
-        gestoreNemico.resettaTuttoNemici ();
+        gestoreNemico.resettaTuttiNemici();
         gestoreOggetto.resettaTuttiOggetti();
         effettiDialogo.clear();
     }
@@ -561,9 +572,9 @@ public class Playing extends Stato implements StatoMetodi
         gestoreOggetto.controllaOggettoToccato (hitbox);
     }
 
-    public void controllaSpuntoniToccati (Giocatore giocatore)
+    public boolean controllaSpuntoniToccatiEntità (Entità entità)
     {
-        gestoreOggetto.controllaSpuntoniToccati (giocatore);
+        return gestoreOggetto.controllaSpuntoniToccati (entità);
     }
 
     public void resettaGiocoCompletato ()
@@ -581,7 +592,7 @@ public class Playing extends Stato implements StatoMetodi
         this.gameOver = gameOver;
     }
 
-    public GestoreNemico getGestioneNemico ()
+    public GestoreNemico getGestoreNemico()
     {
         return gestoreNemico;
     }
@@ -591,7 +602,7 @@ public class Playing extends Stato implements StatoMetodi
         return gestoreOggetto;
     }
 
-    public GestoreLivello getGestioneLivello ()
+    public GestoreLivello getGestoreLivello()
     {
         return gestoreLivello;
     }

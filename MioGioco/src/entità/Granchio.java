@@ -14,7 +14,6 @@ public class Granchio extends Nemico
         initAttackBox (82, 19, 30);
     }
 
-
     public void update (int [][] datiLvl, Playing playing)
     {
         updateComportamento (datiLvl, playing);
@@ -31,7 +30,7 @@ public class Granchio extends Nemico
 
         if (inAria)
         {
-            controlloInAria(datiLvl, playing);
+            controlloInAria (datiLvl, playing);
         }
         else
         {

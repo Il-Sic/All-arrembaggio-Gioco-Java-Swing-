@@ -27,11 +27,11 @@ public class Pioggia
     {
         for (int i = 0; i < gocce.length; i++)
         {
-            gocce[i] = getRndPos();
+            gocce[i] = getRandPos();
         }
     }
 
-    private Point2D.Float getRndPos( )
+    private Point2D.Float getRandPos( )
     {
         return new Point2D.Float((int) getNuovaX(0), rand.nextInt(Gioco.ALTEZZA_GIOCO));
     }
@@ -52,9 +52,7 @@ public class Pioggia
 
     private float getNuovaX (int xLvlOffset)
     {
-        float valore = (-Gioco.LARGHEZZA_GIOCO) + rand.nextInt((int) (Gioco.LARGHEZZA_GIOCO * 3f)) + xLvlOffset;
-
-        return valore;
+        return (float) ((-Gioco.LARGHEZZA_GIOCO) + rand.nextInt((int) (Gioco.LARGHEZZA_GIOCO * 3f)) + xLvlOffset);
     }
 
     public void draw (Graphics g, int xLvlOffset)

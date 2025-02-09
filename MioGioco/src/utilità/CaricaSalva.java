@@ -58,7 +58,6 @@ public class CaricaSalva
         catch (IOException e)
         {
             throw new RuntimeException(e);
-            //e.printStackTrace();
         }
         finally
         {
