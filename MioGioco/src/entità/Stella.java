@@ -23,22 +23,22 @@ public class Stella extends Nemico
         initHitBox (17, 21);
     }
 
-    public void update(int[][] lvlData, Playing playing)
+    public void update(int[][] datiLvl, Playing playing)
     {
-        updateBehavior(lvlData, playing);
+        updateBehavior(datiLvl, playing);
         updateTickAnimazione();
     }
 
-    private void updateBehavior(int[][] lvlData, Playing playing)
+    private void updateBehavior(int[][] datiLvl, Playing playing)
     {
         if (primoUpdate)
         {
-            controlloPrimoUpdate(lvlData);
+            controlloPrimoUpdate(datiLvl);
         }
 
         if (inAria)
         {
-            controlloInAria(lvlData, playing);
+            controlloInAria(datiLvl, playing);
         }
         else
         {
@@ -50,7 +50,7 @@ public class Stella extends Nemico
 
                     if (tickDopoRotolataInIdle >= 120)
                     {
-                        if (IsPavimento (hitbox, lvlData))
+                        if (IsPavimento (hitbox, datiLvl))
                         {
                             nuovoStato(CORSA);
                         }
@@ -69,12 +69,12 @@ public class Stella extends Nemico
                 }
                 case CORSA ->
                 {
-                    if (puòVedereGiocatore(lvlData, playing.getGiocatore()))
+                    if (puòVedereGiocatore(datiLvl, playing.getGiocatore()))
                     {
                         nuovoStato(ATTACCO);
                         setDirCamminata(playing.getGiocatore());
                     }
-                    muovi(lvlData, playing);
+                    muovi(datiLvl, playing);
                 }
 
                 case ATTACCO ->
@@ -88,7 +88,7 @@ public class Stella extends Nemico
                     }
                     else
                     {
-                        muovi(lvlData, playing);
+                        muovi(datiLvl, playing);
                         controllaDannoAlGiocatore (playing.getGiocatore());
                         controllaRotolata(playing);
                     }
@@ -99,7 +99,7 @@ public class Stella extends Nemico
                 {
                     if (indiceAni <= GetContSprite(tipoNemico, stato) - 2)
                     {
-                        contraccolpo (direzioneContraccolpo, lvlData, 2f);
+                        contraccolpo (direzioneContraccolpo, datiLvl, 2f);
                     }
 
                     updateContraccolpoDrawOffset ();
@@ -137,7 +137,7 @@ public class Stella extends Nemico
         }
     }
 
-    protected void muovi (int[][] lvlData, Playing playing)
+    protected void muovi (int[][] datiLvl, Playing playing)
     {
         float xVel = 0;
 
@@ -155,9 +155,9 @@ public class Stella extends Nemico
             xVel *= 2;
         }
 
-        if (PuòMuoversiQui(hitbox.x + xVel, hitbox.y, hitbox.width, hitbox.height, lvlData))
+        if (PuòMuoversiQui(hitbox.x + xVel, hitbox.y, hitbox.width, hitbox.height, datiLvl))
         {
-            if (IsPavimento(hitbox, xVel, lvlData))
+            if (IsPavimento(hitbox, xVel, datiLvl))
             {
                 hitbox.x += xVel;
                 return;

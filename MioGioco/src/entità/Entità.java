@@ -13,7 +13,7 @@ public abstract class Entità
     protected float x, y;
     protected int larghezza, altezza;
     protected Rectangle2D.Float hitbox;
-    protected int tickAni, indiceAni;                                // 30 perchè le animazioni sono a 120 fps / 4 immagini = 30 ma va troppo lento quindi ho incrementato a 50
+    protected int tickAni, indiceAni;
     protected int stato;
     protected float velAria;
     protected boolean inAria = false;

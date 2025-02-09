@@ -31,7 +31,7 @@ public class Granchio extends Nemico
 
         if (inAria)
         {
-            updateInAria (datiLvl);
+            controlloInAria(datiLvl, playing);
         }
         else
         {
